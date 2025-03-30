@@ -1,0 +1,131 @@
+.tutorial-view {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+.loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    height: 300px;
+    gap: 16px;
+}
+
+.section-content {
+    margin-top: 16px;
+}
+
+.markdown-content {
+    line-height: 1.6;
+}
+
+.markdown-content h1,
+.markdown-content h2,
+.markdown-content h3,
+.markdown-content h4,
+.markdown-content h5,
+.markdown-content h6 {
+    margin-top: 24px;
+    margin-bottom: 16px;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.markdown-content code {
+    font-family: 'Source Code Pro', monospace;
+    padding: 0.2em 0.4em;
+    margin: 0;
+    font-size: 85%;
+    background-color: var(--code-bg-color);
+    border-radius: 3px;
+}
+
+.markdown-content pre {
+    padding: 16px;
+    overflow: auto;
+    font-size: 85%;
+    line-height: 1.45;
+    background-color: var(--code-bg-color);
+    border-radius: 6px;
+}
+
+.code-block-selector {
+    margin: 24px 0;
+}
+
+.code-practice-area {
+    margin-top: 24px;
+    animation: slideIn 0.5s ease-in-out;
+}
+
+.code-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 8px;
+}
+
+.code-output {
+    margin-top: 16px;
+    padding: 2px 16px 16px 16px;
+    border-radius: 8px;
+    font-family: 'Source Code Pro', monospace;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    transition: all var(--transition-duration);
+}
+
+.code-output p3 {
+  font-family: 'Microsoft YaHei', serif;
+    font-weight: 700;
+    color: var(--success-color);
+}
+.code-output pre {
+    margin: 0;
+    padding: 0;
+}
+
+.code-output.success {
+    background-color: rgba(82, 196, 26, 0.1);
+    border: 1px solid var(--success-color);
+}
+
+.code-output.error {
+    background-color: rgba(255, 77, 79, 0.1);
+    border: 1px solid var(--error-color);
+}
+
+.code-output pre {
+    margin: 0;
+}
+
+.evaluation-result {
+    margin-top: 16px;
+}
+
+.achievements-section {
+    margin-top: 24px;
+}
+
+.progress-stats {
+    display: flex;
+    gap: 24px;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .code-actions {
+        flex-direction: column;
+    }
+
+    .progress-stats {
+        flex-direction: column;
+        gap: 16px;
+    }
+}

@@ -1,0 +1,128 @@
+.app-layout {
+    min-height: 100vh;
+    user-select: none;
+}
+
+.app-content {
+    padding: 24px;
+    background-color: var(--background-color);
+    transition: all var(--transition-duration);
+    position: relative;
+    overflow: auto;
+    height: calc(100vh - var(--header-height));
+}
+
+.content-container {
+    background-color: var(--card-bg-color);
+    padding: 24px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    min-height: calc(100vh - 140px);
+    transition: all var(--transition-duration);
+}
+
+.theme-toggle {
+    position: absolute;
+    top: 24px;
+    right: 24px;
+    z-index: 10;
+}
+
+/* 代码编辑器样式 */
+.code-editor-container {
+    margin-top: 16px;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    height: 400px;
+}
+
+/* 代码输出区域样式 */
+.code-output {
+    margin-top: 16px;
+    padding: 16px;
+    background-color: var(--code-bg-color);
+    border-radius: 8px;
+    font-family: 'Source Code Pro', monospace;
+    white-space: pre-wrap;
+    overflow-x: auto;
+    transition: all var(--transition-duration);
+}
+
+/* 章节导航样式 */
+.chapter-navigation {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border-color);
+}
+
+/* 成就徽章样式 */
+.achievement-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin: 8px;
+    padding: 8px 16px;
+    background-color: var(--card-bg-color);
+    border-radius: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: all var(--transition-duration);
+}
+
+.achievement-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+}
+
+.achievement-icon {
+    margin-right: 8px;
+    font-size: 20px;
+}
+
+/* 响应式布局 */
+@media (max-width: 768px) {
+    .app-content {
+        padding: 16px;
+    }
+
+    .content-container {
+        padding: 16px;
+    }
+
+    .code-editor-container {
+        height: 300px;
+    }
+}
+
+/* 动画效果 */
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.slide-in {
+    animation: slideIn 0.5s ease-in-out;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}

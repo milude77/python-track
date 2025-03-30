@@ -1,0 +1,43 @@
+.app-header {
+    display: flex;
+    align-items: center;
+    padding: 0 24px;
+    background-color: var(--card-bg-color) !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    height: var(--header-height);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    transition: all var(--transition-duration);
+}
+
+.logo-container {
+    display: flex;
+    align-items: center;
+}
+
+.logo {
+    height: 32px;
+    margin-right: 12px;
+}
+
+.app-title {
+    margin: 0 !important;
+    color: var(--text-color) !important;
+    transition: color var(--transition-duration);
+}
+
+/* 响应式调整 */
+@media (max-width: 768px) {
+    .app-header {
+        padding: 0 16px;
+    }
+
+    .app-title {
+        font-size: 18px !important;
+    }
+
+    .logo {
+        height: 24px;
+    }
+}
