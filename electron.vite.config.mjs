@@ -1,14 +1,42 @@
 import { resolve } from 'path'
 import { defineConfig, externalizeDepsPlugin } from 'electron-vite'
 import react from '@vitejs/plugin-react'
-import { viteStaticCopy } from 'vite-plugin-static-copy' // 需要安装此依赖
+import copy from 'rollup-plugin-copy'
 
 export default defineConfig({
   main: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [
+      externalizeDepsPlugin(),
+        copy({
+        targets: [
+          {
+            src: 'resources/python_ipc_server.exe',
+            dest: 'dist/win-unpacked/resources'
+          },
+          {
+            src: 'notes/*.md',
+            dest: 'dist/win-unpacked/resources/notes'
+          }
+        ]
+      })
+    ]
   },
   preload: {
-    plugins: [externalizeDepsPlugin()]
+    plugins: [
+      externalizeDepsPlugin(),
+            copy({
+        targets: [
+          {
+            src: 'resources/python_ipc_server.exe',
+            dest: 'dist/win-unpacked/resources'
+          },
+          {
+            src: 'notes/*.md',
+            dest: 'dist/win-unpacked/resources/notes'
+          }
+        ]
+      })
+    ]
   },
   renderer: {
     resolve: {
@@ -25,6 +53,20 @@ export default defineConfig({
         }
       }
     },
-    plugins: [react()]
+    plugins: [
+      react(),
+      copy({
+        targets: [
+          {
+            src: 'resources/python_ipc_server.exe',
+            dest: 'dist/win-unpacked/resources'
+          },
+          {
+            src: 'notes/*.md',
+            dest: 'dist/win-unpacked/resources/notes'
+          }
+        ]
+      })
+    ]
   }
 })

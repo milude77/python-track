@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react'
 import { Layout, Menu, Spin } from 'antd'
 import { useNavigate, useParams } from 'react-router-dom'
 import { BookOutlined, LoadingOutlined } from '@ant-design/icons'
-import api from '../api/config'
+import api from '../api/index'
 import './Sidebar.css'
 
 const { Sider } = Layout

@@ -1,34 +1,129 @@
-# react
+# Python学习跟踪系统
 
-An Electron application with React
+![Electron](https://img.shields.io/badge/Electron-28.1.0-47848F?logo=electron) ![React](https://img.shields.io/badge/React-18.2.0-61DAFB?logo=react) ![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python) ![Ant Design](https://img.shields.io/badge/Ant_Design-5.16.2-0170FE?logo=antdesign)![Vite](https://img.shields.io/badge/Vite-6.2.3-646CFF?logo=vite)
 
-## Recommended IDE Setup
+**Python学习跟踪系统**是一个集成代码练习与AI助手的知识管理跨平台桌面应用，结合Electron的桌面能力与Python的计算能力，提供沉浸式学习体验。
 
-- [VSCode](https://code.visualstudio.com/) + [ESLint](https://marketplace.visualstudio.com/items?itemName=dbaeumer.vscode-eslint) + [Prettier](https://marketplace.visualstudio.com/items?itemName=esbenp.prettier-vscode)
+## 🚀 核心特性
 
-## Project Setup
+### 智能学习引擎
+- **实时代码执行**：支持代码片段即时运行，以及是否达到任务要求的练习评估
+- **错误诊断**：Deepseek智能语法检查与错误提示
+- **学习进度跟踪**：自动记录练习完成情况
 
-### Install
+### 跨进程通信
+- **双向IPC通道**：主进程与渲染进程高效通信
+- **Python Shell集成**：安全执行系统级Python命令
+- **进程状态监控**：实时显示Python服务运行状态
 
-```bash
-$ pnpm install
+### 知识管理体系
+- **Markdown笔记**：支持GFM标准语法
+- **学习资源管理**：章节化知识库结构
+
+## 📸 页面截图展示
+
+###  主题切换
+
+| 暗色主题                         | 亮色主题                           |
+|-------------------------------------|--------------------------------|
+| ![暗色主题](imgs/screenshot1.png) | ![亮色主题](imgs/screenshot2.png) |
+
+### 代码运行
+
+| 运行正确                         | 需要调整                           |
+|-------------------------------------|--------------------------------|
+| ![运行正确](imgs/screenshot3.png) | ![需要调整](imgs/screenshot4.png) |
+
+### 获取提示与解决方案
+| 获取提示                         | 解决方案                           |
+|-------------------------------------|--------------------------------|
+| ![获取提示](imgs/screenshot5.png) | ![解决方案](imgs/screenshot6.png) |
+
+## 🛠 技术架构
+
+| 层级         | 技术组件                                                |
+| ------------ | ------------------------------------------------------- |
+| **桌面层**   | Electron 28 + Node.js 20                                |
+| **渲染层**   | React 18 + Ant Design 5 + Monaco Editor                 |
+| **服务层**   | Python 3.11 + OpenAI(deepseek chat)                     |
+| **通信层**   | IPC Main/Renderer + Python Shell                        |
+| **构建工具** | Vite 6 + electron-vite / electron-builder + PyInstaller |
+
+## 📂 项目结构
+
+```
+python-track/
+├── src/                  # 跨进程架构
+│   ├── main/             # Electron主进程（Node.js）
+│   │   ├── ipcHandlers/  # IPC通信处理器
+│   │   └── pythonServer/ # Python服务管理
+│   └── renderer/         # React应用（Web技术）
+│       ├── components/   # 可视化组件
+│       ├── features/     # 业务功能模块
+│       └── stores/       # Zustand状态管理
+│
+├── python-server/        # Python服务端
+│   ├── api/             # FastAPI路由
+│   ├── core/            # 业务逻辑实现
+│   └── utils/           # 辅助工具类
+│
+├── notes/               # Markdown知识库
+│   ├── basics/          # Python基础
+│   ├── oop/             # 面向对象编程
+│   └── advanced/        # 高级特性
+│
+└── resources/           # 应用资源
+    ├── icons/           # 多分辨率应用图标
+    └── python/          # 嵌入式Python环境
 ```
 
-### Development
+## 🛠️ 开发准备
 
+### 环境要求
+- Node.js ≥18.0
+- Python ≥3.10
+- electron-rebuild
+
+### 启动开发环境
 ```bash
-$ pnpm dev
+# 打包Python服务（新终端）
+cd python-server
+.\build_exe.bat.bat
+
+# 安装依赖
+npm install
+
+# 启动Electron开发模式
+npm run dev
+
+# 启动Electron构建打包
+npm run build:win
+
+npm run build:linux
+
+npm run build:mac
+
+# 检查build后的dist/win-unpacked/resources是否存在python_ipc_server.exe
+
+dir /s /b "dist\win-unpacked\resources\python_ipc_server.exe"
+
+# 不存在把根目录的resources目录的python_ipc_server.exe移动到dist/win-unpacked/resources
+
+mkdir "dist\win-unpacked\resources" 2>nul & move /Y "resources\python_ipc_server.exe" "dist\win-unpacked\resources\"
 ```
 
-### Build
+## 🤝 贡献指南
 
-```bash
-# For windows
-$ pnpm build:win
+欢迎通过GitHub提交PR：
+1. 创建特性分支 (`git checkout -b feature/新特性`)
+2. 添加单元测试
+3. 更新文档说明
+4. 提交Pull Request
 
-# For macOS
-$ pnpm build:mac
+## 📜 开源协议
 
-# For Linux
-$ pnpm build:linux
-```
+[MIT License](LICENSE)
+
+---
+
+**让学习可视化，让进步可量化** 🚀 欢迎提出Issue ✨ 

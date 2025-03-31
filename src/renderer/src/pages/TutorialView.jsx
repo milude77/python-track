@@ -8,10 +8,10 @@ import {
   SolutionOutlined,
   TrophyOutlined
 } from '@ant-design/icons'
-import api from '../api/config'
+import api from '../api/index'
 import './TutorialView.css'
 import MarkdownRenderer from '../components/MarkdownRenderer'
-
+import stringToUnicode from '../utils/unicode'
 const { Title, Text } = Typography
 
 function removeCommentsAndPrompt(code) {
@@ -81,7 +81,6 @@ const TutorialView = () => {
       try {
         const response = await api.get(`/api/tutorial/${tutorialKey}`)
         setTutorial(response.data)
-
         // 如果有代码块，设置初始代码
         if (response.data.sections.length > 0 && response.data.sections[0].code_blocks.length > 0) {
           setCode(response.data.sections[0].code_blocks[0])
@@ -108,8 +107,8 @@ const TutorialView = () => {
 
     try {
       const response = await api.post('/api/run-code', {
-        code: code,
-        expected_code: tutorial.sections[currentSectionIndex].code_blocks[currentCodeBlockIndex]
+        code: stringToUnicode(code),
+        expected_code: stringToUnicode(tutorial.sections[currentSectionIndex].code_blocks[currentCodeBlockIndex])
       })
 
       setOutput(response.data.output)
@@ -139,9 +138,9 @@ const TutorialView = () => {
     setHintLoading(true)
     try {
       const response = await api.post('/api/hint', {
-        code: removeCommentsAndPrompt(code),
-        expected_code: tutorial.sections[currentSectionIndex].code_blocks[currentCodeBlockIndex],
-        actual_output: output
+        code: stringToUnicode(removeCommentsAndPrompt(code)),
+        expected_code: stringToUnicode(tutorial.sections[currentSectionIndex].code_blocks[currentCodeBlockIndex]),
+        actual_output: stringToUnicode(output)
       })
 
       message.info(response.data.hint)
@@ -158,9 +157,9 @@ const TutorialView = () => {
     setSolutionLoading(true)
     try {
       const response = await api.post('/api/solution', {
-        code: code,
-        expected_code: tutorial.sections[currentSectionIndex].code_blocks[currentCodeBlockIndex],
-        actual_output: output
+        code: stringToUnicode(code),
+        expected_code: stringToUnicode(tutorial.sections[currentSectionIndex].code_blocks[currentCodeBlockIndex]),
+        actual_output: stringToUnicode(output)
       })
 
       setCode(removePythonCodeBlockSyntax(response.data.solution))

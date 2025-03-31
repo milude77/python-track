@@ -1,5 +1,6 @@
 import { contextBridge } from 'electron'
 import { electronAPI } from '@electron-toolkit/preload'
+import { setupIpcApi } from './ipc_bridge'
 
 // Custom APIs for renderer
 const api = {}
@@ -18,3 +19,6 @@ if (process.contextIsolated) {
   window.electron = electronAPI
   window.api = api
 }
+
+// 设置IPC API
+setupIpcApi()

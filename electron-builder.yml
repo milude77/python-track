@@ -10,9 +10,18 @@ files:
   - '!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}'
   - '!{.env,.env.*,.npmrc,pnpm-lock.yaml}'
   - public/**
+  - resources/**
+  - notes/**
 asarUnpack:
   - public/**
   - resources/**
+extraResources:
+  - from: "python-server"
+    to: "python-server"
+  - from: "notes"
+    to: "notes"
+  - from: "resources"
+    to: "resources"
 win:
   executableName: react
 nsis:
