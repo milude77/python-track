@@ -43,9 +43,9 @@
 
 | 层级         | 技术组件                                                |
 | ------------ | ------------------------------------------------------- |
-| **桌面层**   | Electron 28 + Node.js 20                                |
+| **桌面层**   | Electron 35 + Node.js                                   |
 | **渲染层**   | React 18 + Ant Design 5 + Monaco Editor                 |
-| **服务层**   | Python 3.11 + OpenAI(deepseek chat)                     |
+| **服务层**   | Python 3.11 + DeepSeek Chat API                         |
 | **通信层**   | IPC Main/Renderer + Python Shell                        |
 | **构建工具** | Vite 6 + electron-vite / electron-builder + PyInstaller |
 
@@ -55,26 +55,28 @@
 python-track/
 ├── src/                  # 跨进程架构
 │   ├── main/             # Electron主进程（Node.js）
-│   │   ├── ipcHandlers/  # IPC通信处理器
-│   │   └── pythonServer/ # Python服务管理
+│   ├── preload/          # 预加载脚本
+│   │   └── ipc_bridge.js # IPC通信桥接
 │   └── renderer/         # React应用（Web技术）
+│       ├── api/          # API接口
+│       ├── assets/       # 静态资源
 │       ├── components/   # 可视化组件
-│       ├── features/     # 业务功能模块
-│       └── stores/       # Zustand状态管理
+│       └── pages/        # 页面组件
 │
 ├── python-server/        # Python服务端
-│   ├── api/             # FastAPI路由
-│   ├── core/            # 业务逻辑实现
-│   └── utils/           # 辅助工具类
+│   ├── api_server.py     # RESTful API服务
+│   ├── ai_helper.py      # AI助手实现
+│   ├── ipc_server.py     # IPC通信服务
+│   └── notes/            # Markdown教程文件
+│       ├── chapter01.md  # 基础知识
+│       ├── chapter02.md  # Python序列
+│       └── ...           # 其他章节
 │
-├── notes/               # Markdown知识库
-│   ├── basics/          # Python基础
-│   ├── oop/             # 面向对象编程
-│   └── advanced/        # 高级特性
+├── resources/            # 应用资源
+│   └── python_ipc_server.exe # 打包后的Python服务
 │
-└── resources/           # 应用资源
-    ├── icons/           # 多分辨率应用图标
-    └── python/          # 嵌入式Python环境
+└── imgs/                 # 应用截图
+    └── screenshot*.png   # 界面截图
 ```
 
 ## 🛠️ 开发准备
@@ -126,4 +128,4 @@ mkdir "dist\win-unpacked\resources" 2>nul & move /Y "resources\python_ipc_server
 
 ---
 
-**让学习可视化，让进步可量化** 🚀 欢迎提出Issue ✨ 
+**让学习可视化，让进步可量化** 🚀 欢迎提出Issue ✨
