@@ -1,6 +1,6 @@
 # Python学习跟踪系统
 
-![Electron](https://img.shields.io/badge/Electron-28.1.0-47848F?logo=electron) ![React](https://img.shields.io/badge/React-18.2.0-61DAFB?logo=react) ![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python) ![Ant Design](https://img.shields.io/badge/Ant_Design-5.16.2-0170FE?logo=antdesign)![Vite](https://img.shields.io/badge/Vite-6.2.3-646CFF?logo=vite)
+![Electron](https://img.shields.io/badge/Electron-35.0.3-47848F?logo=electron) ![React](https://img.shields.io/badge/React-18.2.0-61DAFB?logo=react) ![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python) ![Ant Design](https://img.shields.io/badge/Ant_Design-5.16.2-0170FE?logo=antdesign)![Vite](https://img.shields.io/badge/Vite-6.2.3-646CFF?logo=vite)
 
 **Python学习跟踪系统**是一个集成代码练习与AI助手的知识管理跨平台桌面应用，结合Electron的桌面能力与Python的计算能力，提供沉浸式学习体验。
 
