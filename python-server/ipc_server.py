@@ -210,24 +210,98 @@ class IPCServer:
             self._send_error(f"Error getting solution: {str(e)}", request_id)
 
     def _send_response(self, data, request_id=None):
-        """发送响应数据"""
+        """发送响应数据（支持流式传输）"""
         response = {
             "status": "success",
             "data": data
         }
         if request_id:
             response["requestId"] = request_id
-        print(json.dumps(response), flush=True)
+        
+        # 将响应转换为JSON字符串
+        json_str = json.dumps(response, ensure_ascii=False)
+        
+        # 如果响应小于8KB，直接发送
+        if len(json_str) < 8000:
+            print(json_str, flush=True)
+            return
+            
+        # 否则分块发送
+        chunk_size = 8000  # 每块大小约8KB，减小块大小以避免解析问题
+        total_chunks = (len(json_str) + chunk_size - 1) // chunk_size
+        
+        # 发送开始标记
+        print(json.dumps({
+            "status": "stream_start",
+            "total_chunks": total_chunks,
+            "requestId": request_id
+        }, ensure_ascii=False), flush=True)
+        
+        # 分块发送数据
+        for i in range(total_chunks):
+            chunk = json_str[i * chunk_size:(i + 1) * chunk_size]
+            print(json.dumps({
+                "status": "stream_chunk",
+                "chunk_index": i,
+                "chunk_data": chunk,
+                "requestId": request_id
+            }, ensure_ascii=False), flush=True)
+            # 添加小延迟，避免数据发送过快导致接收端缓冲区溢出
+            import time
+            time.sleep(0.01)
+        
+        # 发送结束标记
+        print(json.dumps({
+            "status": "stream_end",
+            "requestId": request_id
+        }, ensure_ascii=False), flush=True)
 
     def _send_error(self, message, request_id=None):
-        """发送错误消息"""
+        """发送错误消息（支持流式传输）"""
         error = {
             "status": "error",
             "message": message
         }
         if request_id:
             error["requestId"] = request_id
-        print(json.dumps(error), flush=True)
+            
+        # 将错误转换为JSON字符串
+        json_str = json.dumps(error, ensure_ascii=False)
+        
+        # 如果错误消息小于8KB，直接发送
+        if len(json_str) < 8000:
+            print(json_str, flush=True)
+            return
+            
+        # 否则分块发送
+        chunk_size = 8000  # 每块大小约8KB，减小块大小以避免解析问题
+        total_chunks = (len(json_str) + chunk_size - 1) // chunk_size
+        
+        # 发送开始标记
+        print(json.dumps({
+            "status": "stream_start",
+            "total_chunks": total_chunks,
+            "requestId": request_id
+        }, ensure_ascii=False), flush=True)
+        
+        # 分块发送数据
+        for i in range(total_chunks):
+            chunk = json_str[i * chunk_size:(i + 1) * chunk_size]
+            print(json.dumps({
+                "status": "stream_chunk",
+                "chunk_index": i,
+                "chunk_data": chunk,
+                "requestId": request_id
+            }, ensure_ascii=False), flush=True)
+            # 添加小延迟，避免数据发送过快导致接收端缓冲区溢出
+            import time
+            time.sleep(0.01)
+        
+        # 发送结束标记
+        print(json.dumps({
+            "status": "stream_end",
+            "requestId": request_id
+        }, ensure_ascii=False), flush=True)
 
 
 if __name__ == "__main__":

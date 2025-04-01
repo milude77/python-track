@@ -26,7 +26,12 @@ function startPythonIpcServer() {
 
     // 如果不存在，则尝试在python-server目录下查找
     if (!fs.existsSync(scriptPath)) {
-      scriptPath = path.join(process.resourcesPath, 'python-server', 'dist', 'python_ipc_server.exe')
+      scriptPath = path.join(
+        process.resourcesPath,
+        'python-server',
+        'dist',
+        'python_ipc_server.exe'
+      )
     }
 
     pythonCommand = scriptPath
@@ -50,34 +55,167 @@ function startPythonIpcServer() {
   pythonProcess.stdout.setEncoding('utf8')
   pythonProcess.stderr.setEncoding('utf8')
 
+  // 存储流式传输的数据
+  const streamBuffers = new Map()
+
   // 处理Python进程的标准输出
+  let dataBuffer = '' // 用于存储不完整的JSON数据
   pythonProcess.stdout.on('data', (data) => {
     try {
-      // 可能一次收到多行数据，按行分割处理
-      const lines = data.toString().trim().split('\n')
+      // 将新数据添加到缓冲区
+      dataBuffer += data.toString()
 
-      for (const line of lines) {
-        if (!line) continue
+      // 尝试从缓冲区中提取完整的JSON对象
+      let startIndex = 0
+      let endIndex
 
-        const response = JSON.parse(line)
-        console.log('Python响应:', response)
+      // 循环处理缓冲区中的所有完整JSON对象
+      while ((endIndex = findJsonEnd(dataBuffer, startIndex)) !== -1) {
+        const jsonStr = dataBuffer.substring(startIndex, endIndex + 1)
+        startIndex = endIndex + 1
 
-        // 如果是请求响应，处理待处理的请求
-        if (response.status && pendingRequests.has(response.requestId)) {
-          const { resolve, reject } = pendingRequests.get(response.requestId)
-          pendingRequests.delete(response.requestId)
+        try {
+          const response = JSON.parse(jsonStr)
+          console.log('Python响应类型:', response.status)
 
-          if (response.status === 'error') {
-            reject(new Error(response.message))
-          } else {
-            resolve(response)
+          // 处理流式传输
+          if (response.status === 'stream_start') {
+            // 初始化流缓冲区
+            streamBuffers.set(response.requestId, {
+              chunks: new Array(response.total_chunks).fill(''),
+              total: response.total_chunks,
+              received: 0,
+              completed: false // 添加标志表示是否已完成
+            })
+          } else if (response.status === 'stream_chunk') {
+            // 存储数据块
+            const buffer = streamBuffers.get(response.requestId)
+            if (buffer && !buffer.completed) {
+              buffer.chunks[response.chunk_index] = response.chunk_data
+              buffer.received++
+
+              // 检查是否所有块都已接收
+              if (buffer.received === buffer.total) {
+                processCompleteStream(response.requestId, buffer)
+              }
+            }
+          } else if (response.status === 'stream_end') {
+            // 标记流传输结束
+            const buffer = streamBuffers.get(response.requestId)
+            if (buffer && !buffer.completed && buffer.received === buffer.total) {
+              processCompleteStream(response.requestId, buffer)
+            }
+          } else if (response.status && pendingRequests.has(response.requestId)) {
+            // 处理常规响应（非流式）
+            const { resolve, reject } = pendingRequests.get(response.requestId)
+            pendingRequests.delete(response.requestId)
+
+            if (response.status === 'error') {
+              reject(new Error(response.message))
+            } else {
+              resolve(response)
+            }
           }
+        } catch (jsonError) {
+          console.error('解析JSON时出错:', jsonError, '\n原始数据:', jsonStr)
         }
+      }
+
+      // 保留未处理的数据部分
+      if (startIndex > 0) {
+        dataBuffer = dataBuffer.substring(startIndex)
+      }
+
+      // 如果缓冲区过大，可能是因为接收了不完整的数据，进行清理
+      if (dataBuffer.length > 1000000) {
+        // 1MB限制
+        console.warn('数据缓冲区过大，清理中...')
+        dataBuffer = dataBuffer.substring(dataBuffer.length - 100000) // 保留最后100KB
       }
     } catch (error) {
       console.error('处理Python响应时出错:', error)
     }
   })
+
+  // 辅助函数：查找JSON对象的结束位置
+  function findJsonEnd(str, startPos) {
+    try {
+      // 找到可能的JSON开始位置
+      let pos = str.indexOf('{', startPos)
+      if (pos === -1) return -1
+
+      let openBraces = 0
+      let inString = false
+      let escaped = false
+
+      for (let i = pos; i < str.length; i++) {
+        const char = str[i]
+
+        if (inString) {
+          if (escaped) {
+            escaped = false
+          } else if (char === '\\') {
+            escaped = true
+          } else if (char === '"') {
+            inString = false
+          }
+        } else if (char === '"') {
+          inString = true
+        } else if (char === '{') {
+          openBraces++
+        } else if (char === '}') {
+          openBraces--
+          if (openBraces === 0) {
+            return i // 找到JSON结束位置
+          }
+        }
+      }
+
+      return -1 // 未找到完整的JSON
+    } catch (e) {
+      console.error('查找JSON结束位置时出错:', e)
+      return -1
+    }
+  }
+
+  // 辅助函数：处理完整的流数据
+  function processCompleteStream(requestId, buffer) {
+    try {
+      // 标记为已完成，防止重复处理
+      buffer.completed = true
+
+      // 重组完整数据
+      const fullJson = buffer.chunks.join('')
+      try {
+        const fullResponse = JSON.parse(fullJson)
+        console.log('流式传输完成，重组数据成功')
+
+        // 处理重组后的响应
+        if (pendingRequests.has(requestId)) {
+          const { resolve, reject } = pendingRequests.get(requestId)
+          pendingRequests.delete(requestId)
+
+          if (fullResponse.status === 'error') {
+            reject(new Error(fullResponse.message))
+          } else {
+            resolve(fullResponse)
+          }
+        }
+      } catch (parseError) {
+        console.error('解析重组数据时出错:', parseError)
+        if (pendingRequests.has(requestId)) {
+          const { reject } = pendingRequests.get(requestId)
+          pendingRequests.delete(requestId)
+          reject(new Error('解析流式数据失败'))
+        }
+      }
+
+      // 清理缓冲区
+      streamBuffers.delete(requestId)
+    } catch (e) {
+      console.error('处理完整流数据时出错:', e)
+    }
+  }
 
   // 处理Python进程的标准错误
   pythonProcess.stderr.on('data', (data) => {
