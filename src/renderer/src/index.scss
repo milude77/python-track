@@ -13,6 +13,12 @@
     --transition-duration: 0.3s;
     --sidebar-width: 250px;
     --header-height: 64px;
+
+    /* 滚动条变量 */
+    --scrollbar-thumb-color: rgba(0, 0, 0, 0.2);
+    --scrollbar-thumb-hover-color: rgba(0, 0, 0, 0.3);
+    --scrollbar-track-color: rgba(0, 0, 0, 0.05);
+    --scrollbar-width: 8px;
 }
 
 [data-theme='dark'] {
@@ -27,6 +33,11 @@
     --warning-color: #d89614;
     --error-color: #a61d24;
     --code-bg-color: #282c34;
+
+    /* 暗色主题滚动条变量 */
+    --scrollbar-thumb-color: rgba(255, 255, 255, 0.2);
+    --scrollbar-thumb-hover-color: rgba(255, 255, 255, 0.3);
+    --scrollbar-track-color: rgba(255, 255, 255, 0.05);
 }
 
 body {
@@ -45,4 +56,29 @@ code {
     padding: 0.2em 0.4em;
     border-radius: 3px;
     font-size: 0.9em;
+}
+
+/* 自定义滚动条样式 */
+::-webkit-scrollbar {
+    width: var(--scrollbar-width);
+    height: var(--scrollbar-width);
+}
+
+::-webkit-scrollbar-track {
+    background: var(--scrollbar-track-color);
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--scrollbar-thumb-color);
+    border-radius: 4px;
+    transition: all var(--transition-duration);
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--scrollbar-thumb-hover-color);
+}
+
+::-webkit-scrollbar-corner {
+    background: transparent;
 }
