@@ -194,6 +194,8 @@ const TutorialView = () => {
     setOutput('')
     setOutputStatus('idle')
     setEvaluation(null)
+    setHintLoading(false)
+    setSolutionLoading(false)
   }
 
   // 切换代码块
@@ -203,6 +205,8 @@ const TutorialView = () => {
     setOutput('')
     setOutputStatus('idle')
     setEvaluation(null)
+    setHintLoading(false)
+    setSolutionLoading(false)
   }
 
   // 渲染章节内容
