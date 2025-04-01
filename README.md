@@ -1,6 +1,6 @@
 # Python学习跟踪系统
 
-![Electron](https://img.shields.io/badge/Electron-35.0.3-47848F?logo=electron) ![React](https://img.shields.io/badge/React-18.2.0-61DAFB?logo=react) ![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python) ![Ant Design](https://img.shields.io/badge/Ant_Design-5.16.2-0170FE?logo=antdesign)![Vite](https://img.shields.io/badge/Vite-6.2.3-646CFF?logo=vite)
+![Electron](https://img.shields.io/badge/Electron-35.0.3-47848F?logo=electron) ![React](https://img.shields.io/badge/React-18.2.0-61DAFB?logo=react) ![Python](https://img.shields.io/badge/Python-3.11-3776AB?logo=python) ![Ant Design](https://img.shields.io/badge/Ant_Design-5.16.2-0170FE?logo=antdesign)![Vite](https://img.shields.io/badge/Vite-6.2.4-646CFF?logo=vite)
 
 **Python学习跟踪系统**是一个集成代码练习与AI助手的知识管理跨平台桌面应用，结合Electron的桌面能力与Python的计算能力，提供沉浸式学习体验。
 
@@ -105,13 +105,6 @@ npm run build:linux
 
 npm run build:mac
 
-# 检查build后的dist/win-unpacked/resources是否存在python_ipc_server.exe
-
-dir /s /b "dist\win-unpacked\resources\python_ipc_server.exe"
-
-# 不存在把根目录的resources目录的python_ipc_server.exe移动到dist/win-unpacked/resources
-
-mkdir "dist\win-unpacked\resources" 2>nul & move /Y "resources\python_ipc_server.exe" "dist\win-unpacked\resources\"
 ```
 
 ## 🤝 贡献指南
