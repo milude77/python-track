@@ -1,11 +1,11 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { Layout, ConfigProvider, theme, Button } from 'antd'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { BulbOutlined, BulbFilled } from '@ant-design/icons'
 import AppHeader from './components/AppHeader'
 import Sidebar from './components/Sidebar'
 import TutorialView from './pages/TutorialView'
-import './App.css'
+import './App.scss'
 
 const { Content } = Layout
 
@@ -29,7 +29,7 @@ const App = () => {
   // 初始化主题
   useEffect(() => {
     document.documentElement.setAttribute('data-theme', isDarkMode ? 'dark' : 'light')
-  }, [])
+  }, [isDarkMode])
 
   return (
     <ConfigProvider

@@ -12,6 +12,7 @@ Prism.plugins.autoloader.languages_path =
 Prism.languages.vue = Prism.languages.html // 提前注册扩展语言
 const { useToken } = theme
 
+// eslint-disable-next-line react/prop-types
 const MarkdownRenderer = ({ content }) => {
   const { token } = useToken()
   const containerRef = useRef(null)
@@ -244,7 +245,7 @@ const MarkdownRenderer = ({ content }) => {
                   fontFamily: "'JetBrains Mono', monospace"
                 }}
               >
-                <code className={className} {...props}>
+                <code className={className} {...props} style={{ fontSize: '0.9rem' }}>
                   {children}
                 </code>
               </pre>

@@ -15,7 +15,7 @@ const getBaseUrl = () => {
 // 创建axios实例
 const api = axios.create({
   baseURL: getBaseUrl(),
-  timeout: 0,  // 设置为0表示取消超时限制
+  timeout: 0, // 设置为0表示取消超时限制
   headers: {
     'Content-Type': 'application/json'
   }

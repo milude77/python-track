@@ -1,0 +1,30 @@
+.app-sidebar {
+    background-color: var(--card-bg-color) !important;
+    transition: all var(--transition-duration);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    overflow: auto;
+    height: calc(100vh - 64px);
+
+    &::-webkit-scrollbar {
+        width: 4px;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: rgba(0, 0, 0, 0.2);
+        border-radius: 4px;
+    }
+}
+
+.sidebar-menu {
+    background-color: var(--card-bg-color) !important;
+    border-right: none !important;
+}
+
+.sidebar-loading {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100px;
+    margin-top: 20px;
+    color: var(--text-color);
+}

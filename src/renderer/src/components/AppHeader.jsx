@@ -1,5 +1,5 @@
 import { Layout, Typography } from 'antd'
-import './AppHeader.css'
+import './AppHeader.scss'
 import icon from '../../../../resources/python-logo.svg?asset'
 const { Header } = Layout
 const { Title } = Typography

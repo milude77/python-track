@@ -9,7 +9,7 @@ import {
   TrophyOutlined
 } from '@ant-design/icons'
 import api from '../api/index'
-import './TutorialView.css'
+import './TutorialView.scss'
 import MarkdownRenderer from '../components/MarkdownRenderer'
 import stringToUnicode from '../utils/unicode'
 const { Title, Text } = Typography
@@ -108,7 +108,9 @@ const TutorialView = () => {
     try {
       const response = await api.post('/api/run-code', {
         code: stringToUnicode(code),
-        expected_code: stringToUnicode(tutorial.sections[currentSectionIndex].code_blocks[currentCodeBlockIndex])
+        expected_code: stringToUnicode(
+          tutorial.sections[currentSectionIndex].code_blocks[currentCodeBlockIndex]
+        )
       })
 
       setOutput(response.data.output)
@@ -139,7 +141,9 @@ const TutorialView = () => {
     try {
       const response = await api.post('/api/hint', {
         code: stringToUnicode(removeCommentsAndPrompt(code)),
-        expected_code: stringToUnicode(tutorial.sections[currentSectionIndex].code_blocks[currentCodeBlockIndex]),
+        expected_code: stringToUnicode(
+          tutorial.sections[currentSectionIndex].code_blocks[currentCodeBlockIndex]
+        ),
         actual_output: stringToUnicode(output)
       })
 
@@ -158,7 +162,9 @@ const TutorialView = () => {
     try {
       const response = await api.post('/api/solution', {
         code: stringToUnicode(code),
-        expected_code: stringToUnicode(tutorial.sections[currentSectionIndex].code_blocks[currentCodeBlockIndex]),
+        expected_code: stringToUnicode(
+          tutorial.sections[currentSectionIndex].code_blocks[currentCodeBlockIndex]
+        ),
         actual_output: stringToUnicode(output)
       })
 

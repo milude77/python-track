@@ -176,7 +176,7 @@ app.whenReady().then(() => {
             pendingRequests.delete(requestId)
             reject(new Error('请求超时'))
           }
-        }, 30000) // 30秒超时
+        }, 60000) // 增加到60秒超时，给AI响应更多时间
       } catch (error) {
         reject(error)
       }
