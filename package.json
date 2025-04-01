@@ -18,16 +18,18 @@
     "build:linux": "npm run build && electron-builder --linux"
   },
   "build": {
-    "productName":"py-track",
+    "productName": "py-track",
     "appId": "com.hhyufan.py_track",
     "asar": true,
     "files": [
       "!**/.vscode/*",
       "!src/*",
-      "src/renderer/src/vs/**",
       "!electron.vite.config.{js,ts,mjs,cjs}",
       "!{.eslintignore,.eslintrc.cjs,.prettierignore,.prettierrc.yaml,dev-app-update.yml,CHANGELOG.md,README.md}",
       "!{.env,.env.*,.npmrc,pnpm-lock.yaml}",
+      "!imgs/*",
+      "!resources/*",
+      "!python-server/*",
       "out/**/*",
       "package.json"
     ],
@@ -56,35 +58,19 @@
       "to": "python_ipc_server.exe"
     }
   },
-  "dependencies": {
-    "@ant-design/icons": "^5.2.6",
-    "@electron-toolkit/preload": "^3.0.1",
-    "@electron-toolkit/utils": "^4.0.0",
-    "@monaco-editor/react": "^4.5.1",
-    "antd": "^5.10.0",
-    "axios": "^1.5.0",
-    "electron-store": "^10.0.1",
-    "monaco-editor": "^0.52.2",
-    "net": "^1.0.2",
-    "prism-themes": "^1.9.0",
-    "prismjs": "^1.30.0",
-    "python-shell": "^5.0.0",
-    "react-markdown": "^10.1.0",
-    "react-router-dom": "^6.16.0",
-    "rehype-highlight": "^6.0.0",
-    "remark-gfm": "^4.0.1",
-    "rollup-plugin-copy": "^3.5.0",
-    "spawn": "^0.0.1",
-    "webworker": "^0.8.4"
-  },
   "devDependencies": {
+    "@ant-design/icons": "^5.2.6",
     "@electron-toolkit/eslint-config": "^2.0.0",
     "@electron-toolkit/eslint-config-prettier": "^3.0.0",
+    "@electron-toolkit/preload": "^3.0.1",
+    "@electron-toolkit/utils": "^4.0.0",
     "@types/babel__core": "^7.20.5",
     "@types/babel__generator": "^7.6.8",
     "@types/babel__template": "^7.4.4",
     "@types/babel__traverse": "^7.20.7",
     "@vitejs/plugin-react": "^4.3.4",
+    "antd": "^5.10.0",
+    "axios": "^1.5.0",
     "electron": "^35.0.3",
     "electron-builder": "^25.1.8",
     "electron-vite": "^3.1.0",
@@ -93,11 +79,14 @@
     "eslint-plugin-react-hooks": "^5.2.0",
     "eslint-plugin-react-refresh": "^0.4.19",
     "prettier": "^3.5.3",
+    "prism-themes": "^1.9.0",
+    "prismjs": "^1.30.0",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",
+    "react-markdown": "^10.1.0",
+    "react-router-dom": "^6.16.0",
+    "remark-gfm": "^4.0.1",
     "sass-embedded": "^1.86.1",
-    "vite": "^6.2.3",
-    "vite-plugin-monaco-editor": "^1.1.0",
-    "vite-plugin-static-copy": "^2.3.0"
+    "vite": "^6.2.4"
   }
 }
