@@ -81,6 +81,8 @@ const TutorialView = () => {
       try {
         const response = await api.get(`/api/tutorial/${tutorialKey}`)
         setTutorial(response.data)
+        // 重置代码块索引
+        setCurrentCodeBlockIndex(0)
         // 如果有代码块，设置初始代码
         if (response.data.sections.length > 0 && response.data.sections[0].code_blocks.length > 0) {
           setCode(addHashToLines(response.data.sections[0].code_blocks[0]))
