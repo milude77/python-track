@@ -244,7 +244,10 @@ function createWindow() {
     height: 670,
     show: false,
     autoHideMenuBar: true,
+    frame: false, // 移除默认窗口标题栏
     ...(process.platform === 'linux' ? { icon } : {}),
+    title: 'Python代码跟练系统',
+    icon: icon,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),
       sandbox: false
@@ -282,6 +285,28 @@ app.whenReady().then(() => {
   // see https://github.com/alex8088/electron-toolkit/tree/master/packages/utils
   app.on('browser-window-created', (_, window) => {
     optimizer.watchWindowShortcuts(window)
+  })
+
+  // 处理窗口控制
+  ipcMain.on('window-control', (event, command) => {
+    const window = BrowserWindow.getFocusedWindow()
+    if (window) {
+      switch (command) {
+        case 'minimize':
+          window.minimize()
+          break
+        case 'maximize':
+          if (window.isMaximized()) {
+            window.unmaximize()
+          } else {
+            window.maximize()
+          }
+          break
+        case 'close':
+          window.close()
+          break
+      }
+    }
   })
 
   // 处理IPC请求

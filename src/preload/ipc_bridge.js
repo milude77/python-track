@@ -35,6 +35,18 @@ const ipcApi = {
       command: 'get_solution',
       payload: data
     })
+  },
+  // 窗口控制 - 最小化
+  minimizeWindow: () => {
+    ipcRenderer.send('window-control', 'minimize')
+  },
+  // 窗口控制 - 最大化/还原
+  maximizeWindow: () => {
+    ipcRenderer.send('window-control', 'maximize')
+  },
+  // 窗口控制 - 关闭
+  closeWindow: () => {
+    ipcRenderer.send('window-control', 'close')
   }
 }
 
