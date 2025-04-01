@@ -38,6 +38,7 @@
       "icon": "build/icons/icon.ico",
       "target": [
         {
+          "target": "nsis",
           "arch": [
             "ia32"
           ]
