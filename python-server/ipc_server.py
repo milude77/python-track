@@ -219,7 +219,7 @@ class IPCServer:
             response["requestId"] = request_id
         
         # 将响应转换为JSON字符串
-        json_str = json.dumps(response, ensure_ascii=False)
+        json_str = json.dumps(response)
         
         # 如果响应小于8KB，直接发送
         if len(json_str) < 8000:
@@ -235,7 +235,7 @@ class IPCServer:
             "status": "stream_start",
             "total_chunks": total_chunks,
             "requestId": request_id
-        }, ensure_ascii=False), flush=True)
+        }), flush=True)
         
         # 分块发送数据
         for i in range(total_chunks):
@@ -245,7 +245,7 @@ class IPCServer:
                 "chunk_index": i,
                 "chunk_data": chunk,
                 "requestId": request_id
-            }, ensure_ascii=False), flush=True)
+            }), flush=True)
             # 添加小延迟，避免数据发送过快导致接收端缓冲区溢出
             import time
             time.sleep(0.01)
@@ -254,7 +254,7 @@ class IPCServer:
         print(json.dumps({
             "status": "stream_end",
             "requestId": request_id
-        }, ensure_ascii=False), flush=True)
+        }), flush=True)
 
     def _send_error(self, message, request_id=None):
         """发送错误消息（支持流式传输）"""
@@ -266,7 +266,7 @@ class IPCServer:
             error["requestId"] = request_id
             
         # 将错误转换为JSON字符串
-        json_str = json.dumps(error, ensure_ascii=False)
+        json_str = json.dumps(error)
         
         # 如果错误消息小于8KB，直接发送
         if len(json_str) < 8000:
@@ -282,7 +282,7 @@ class IPCServer:
             "status": "stream_start",
             "total_chunks": total_chunks,
             "requestId": request_id
-        }, ensure_ascii=False), flush=True)
+        }), flush=True)
         
         # 分块发送数据
         for i in range(total_chunks):
@@ -292,7 +292,7 @@ class IPCServer:
                 "chunk_index": i,
                 "chunk_data": chunk,
                 "requestId": request_id
-            }, ensure_ascii=False), flush=True)
+            }), flush=True)
             # 添加小延迟，避免数据发送过快导致接收端缓冲区溢出
             import time
             time.sleep(0.01)
@@ -301,7 +301,7 @@ class IPCServer:
         print(json.dumps({
             "status": "stream_end",
             "requestId": request_id
-        }, ensure_ascii=False), flush=True)
+        }), flush=True)
 
 
 if __name__ == "__main__":
