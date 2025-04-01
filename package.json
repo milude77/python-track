@@ -36,9 +36,10 @@
     "prism-themes": "^1.9.0",
     "prismjs": "^1.30.0",
     "python-shell": "^5.0.0",
-    "react-markdown": "^8.0.7",
+    "react-markdown": "^10.1.0",
     "react-router-dom": "^6.16.0",
     "rehype-highlight": "^6.0.0",
+    "remark-gfm": "^4.0.1",
     "rollup-plugin-copy": "^3.5.0",
     "spawn": "^0.0.1",
     "webworker": "^0.8.4"

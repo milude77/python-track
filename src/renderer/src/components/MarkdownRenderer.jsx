@@ -1,6 +1,7 @@
 import { useEffect, useRef } from 'react'
 import ReactMarkdown from 'react-markdown'
 import Prism from 'prismjs'
+import remarkGfm from 'remark-gfm'
 import 'prismjs/plugins/autoloader/prism-autoloader'
 import 'prism-themes/themes/prism-one-light.css'
 import { theme } from 'antd'
@@ -207,6 +208,7 @@ const MarkdownRenderer = ({ content }) => {
   return (
     <div ref={containerRef}>
       <ReactMarkdown
+        remarkPlugins={[[remarkGfm, { singleTilde: false }]]}
         components={{
           p: ({ children }) => <p style={textStyle}>{children}</p>,
           h1: ({ children }) => <h1 style={{ ...headingStyle, fontSize: '2rem' }}>{children}</h1>,

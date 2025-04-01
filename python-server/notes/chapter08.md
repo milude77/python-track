@@ -8,18 +8,18 @@
 
 常见的内置异常类型：
 
-| 异常类型 | 描述 |
-| --- | --- |
-| `SyntaxError` | 语法错误 |
-| `NameError` | 尝试访问未定义的变量 |
-| `TypeError` | 操作或函数应用于不适当类型的对象 |
-| `ValueError` | 操作或函数接收到类型正确但值不合适的参数 |
-| `IndexError` | 序列中没有此索引 |
-| `KeyError` | 字典中没有此键 |
-| `FileNotFoundError` | 找不到文件或目录 |
-| `ZeroDivisionError` | 除数为零 |
-| `ImportError` | 导入模块失败 |
-| `IOError` | 输入/输出操作失败 |
+| 异常类型                | 描述                   |
+|---------------------|----------------------|
+| `SyntaxError`       | 语法错误                 |
+| `NameError`         | 尝试访问未定义的变量           |
+| `TypeError`         | 操作或函数应用于不适当类型的对象     |
+| `ValueError`        | 操作或函数接收到类型正确但值不合适的参数 |
+| `IndexError`        | 序列中没有此索引             |
+| `KeyError`          | 字典中没有此键              |
+| `FileNotFoundError` | 找不到文件或目录             |
+| `ZeroDivisionError` | 除数为零                 |
+| `ImportError`       | 导入模块失败               |
+| `IOError`           | 输入/输出操作失败            |
 
 ### 8.1.2 异常的结构
 
@@ -179,13 +179,13 @@ class BankAccount:
     def __init__(self, name, balance=0):
         self.name = name
         self.balance = balance
-        
+
     def deposit(self, amount):
         if amount <= 0:
             raise ValueError("存款金额必须为正数")
         self.balance += amount
         return self.balance
-    
+
     def withdraw(self, amount):
         if amount <= 0:
             raise ValueError("取款金额必须为正数")
@@ -301,11 +301,11 @@ with open("example.txt", "r") as file:
 class MyContextManager:
     def __init__(self, name):
         self.name = name
-        
+
     def __enter__(self):
         print(f"{self.name} 已打开")
         return self  # 返回值赋给as后的变量
-    
+
     def __exit__(self, exc_type, exc_val, exc_tb):
         print(f"{self.name} 已关闭")
         # 如果返回True，则抑制异常传播
