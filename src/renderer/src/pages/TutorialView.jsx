@@ -81,6 +81,8 @@ const TutorialView = () => {
       try {
         const response = await api.get(`/api/tutorial/${tutorialKey}`)
         setTutorial(response.data)
+        // 重置子章节索引
+        setCurrentSectionIndex(0)
         // 重置代码块索引
         setCurrentCodeBlockIndex(0)
         // 如果有代码块，设置初始代码
