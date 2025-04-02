@@ -259,6 +259,45 @@ function createWindow() {
     mainWindow.show()
   })
 
+  // 添加窗口关闭前的事件处理
+  mainWindow.on('close', () => {
+    // 确保Python进程在窗口关闭前被终止
+    if (pythonProcess && !pythonProcess.killed) {
+      try {
+        // 在Windows上使用taskkill强制终止进程及其子进程
+        if (process.platform === 'win32' && pythonProcess.pid) {
+          const { execSync } = require('child_process')
+          try {
+            // 确保使用/t参数终止所有子进程
+            execSync(`taskkill /pid ${pythonProcess.pid} /f /t`)
+            console.log(`窗口关闭前已强制终止Python进程及其子进程(PID: ${pythonProcess.pid})`)
+            
+            // 等待一小段时间确保进程完全终止
+            setTimeout(() => {
+              // 检查进程是否仍然存在
+              try {
+                execSync(`tasklist /fi "pid eq ${pythonProcess.pid}" /fo csv /nh`)
+                console.warn(`窗口关闭前Python进程(PID: ${pythonProcess.pid})可能仍在运行，尝试再次终止`)
+                execSync(`taskkill /pid ${pythonProcess.pid} /f /t`)
+              } catch (checkError) {
+                // 如果tasklist命令失败，说明进程已经不存在
+                console.log(`窗口关闭前确认Python进程(PID: ${pythonProcess.pid})已终止`)
+              }
+            }, 500)
+          } catch (e) {
+            console.error('窗口关闭前使用taskkill终止进程失败:', e)
+          }
+        }
+
+        // 常规终止方式作为备选
+        pythonProcess.kill('SIGKILL')
+        pythonProcess = null
+      } catch (error) {
+        console.error('窗口关闭前终止Python进程时出错:', error)
+      }
+    }
+  })
+
   mainWindow.webContents.setWindowOpenHandler((details) => {
     shell.openExternal(details.url)
     return { action: 'deny' }
@@ -303,6 +342,28 @@ app.whenReady().then(() => {
           }
           break
         case 'close':
+          // 先终止Python进程，再关闭窗口
+          if (pythonProcess && !pythonProcess.killed) {
+            try {
+              // 在Windows上使用taskkill强制终止进程及其子进程
+              if (process.platform === 'win32' && pythonProcess.pid) {
+                const { execSync } = require('child_process')
+                try {
+                  // 确保使用/t参数终止所有子进程
+                  execSync(`taskkill /pid ${pythonProcess.pid} /f /t`)
+                  console.log(`已强制终止Python进程及其子进程(PID: ${pythonProcess.pid})`)
+                } catch (e) {
+                  console.error('使用taskkill终止进程失败:', e)
+                }
+              }
+
+              // 常规终止方式作为备选
+              pythonProcess.kill('SIGKILL')
+              pythonProcess = null
+            } catch (error) {
+              console.error('终止Python进程时出错:', error)
+            }
+          }
           window.close()
           break
       }
@@ -360,10 +421,40 @@ app.whenReady().then(() => {
 // explicitly with Cmd + Q.
 app.on('window-all-closed', () => {
   if (process.platform !== 'darwin') {
-    // 关闭Python进程
+    // 关闭Python进程，使用更强制的方式
     if (pythonProcess && !pythonProcess.killed) {
-      pythonProcess.kill()
-      pythonProcess = null
+      try {
+        // 在Windows上使用taskkill强制终止进程
+        if (process.platform === 'win32' && pythonProcess.pid) {
+          const { execSync } = require('child_process')
+          try {
+            // 确保使用/t参数终止所有子进程
+            execSync(`taskkill /pid ${pythonProcess.pid} /f /t`)
+            console.log(`已强制终止Python进程及其子进程(PID: ${pythonProcess.pid})`)
+            
+            // 等待一小段时间确保进程完全终止
+            setTimeout(() => {
+              // 检查进程是否仍然存在
+              try {
+                execSync(`tasklist /fi "pid eq ${pythonProcess.pid}" /fo csv /nh`)
+                console.warn(`Python进程(PID: ${pythonProcess.pid})可能仍在运行，尝试再次终止`)
+                execSync(`taskkill /pid ${pythonProcess.pid} /f /t`)
+              } catch (checkError) {
+                // 如果tasklist命令失败，说明进程已经不存在
+                console.log(`确认Python进程(PID: ${pythonProcess.pid})已终止`)
+              }
+            }, 500)
+          } catch (e) {
+            console.error('使用taskkill终止进程失败:', e)
+          }
+        }
+
+        // 常规终止方式作为备选
+        pythonProcess.kill('SIGKILL')
+        pythonProcess = null
+      } catch (error) {
+        console.error('终止Python进程时出错:', error)
+      }
     }
     app.quit()
   }
@@ -372,7 +463,37 @@ app.on('window-all-closed', () => {
 // 应用退出时关闭Python进程
 app.on('quit', () => {
   if (pythonProcess && !pythonProcess.killed) {
-    pythonProcess.kill()
-    pythonProcess = null
+    try {
+      // 在Windows上使用taskkill强制终止进程
+      if (process.platform === 'win32' && pythonProcess.pid) {
+        const { execSync } = require('child_process')
+        try {
+          // 确保使用/t参数终止所有子进程
+          execSync(`taskkill /pid ${pythonProcess.pid} /f /t`)
+          console.log(`应用退出时已强制终止Python进程及其子进程(PID: ${pythonProcess.pid})`)
+          
+          // 等待一小段时间确保进程完全终止
+          setTimeout(() => {
+            // 检查进程是否仍然存在
+            try {
+              execSync(`tasklist /fi "pid eq ${pythonProcess.pid}" /fo csv /nh`)
+              console.warn(`应用退出时Python进程(PID: ${pythonProcess.pid})可能仍在运行，尝试再次终止`)
+              execSync(`taskkill /pid ${pythonProcess.pid} /f /t`)
+            } catch (checkError) {
+              // 如果tasklist命令失败，说明进程已经不存在
+              console.log(`应用退出时确认Python进程(PID: ${pythonProcess.pid})已终止`)
+            }
+          }, 500)
+        } catch (e) {
+          console.error('应用退出时使用taskkill终止进程失败:', e)
+        }
+      }
+
+      // 常规终止方式作为备选
+      pythonProcess.kill('SIGKILL')
+      pythonProcess = null
+    } catch (error) {
+      console.error('应用退出时终止Python进程时出错:', error)
+    }
   }
 })

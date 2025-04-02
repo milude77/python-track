@@ -174,4 +174,4 @@ ENV/
 out/
 python-server/build/
 *.exe
-!python_ipc_server.exe
+/resources/

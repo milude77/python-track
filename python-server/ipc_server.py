@@ -10,6 +10,7 @@ Python代码跟练系统IPC服务器
 import os
 import sys
 import json
+import signal
 import traceback
 from pathlib import Path
 from threading import Thread
@@ -41,6 +42,36 @@ class IPCServer:
         self.extract_code_blocks = extract_code_blocks
         self.extract_sections = extract_sections
         self.run_code = run_code
+        
+        # 注册信号处理器
+        self._setup_signal_handlers()
+
+    def _setup_signal_handlers(self):
+        """设置信号处理器以确保优雅退出"""
+        # 处理SIGTERM信号（进程终止信号）
+        def handle_sigterm(signum, frame):
+            print(json.dumps({"status": "shutdown", "message": "Received SIGTERM, shutting down"}), flush=True)
+            self.running = False
+            sys.exit(0)
+            
+        # 处理SIGINT信号（键盘中断，如Ctrl+C）
+        def handle_sigint(signum, frame):
+            print(json.dumps({"status": "shutdown", "message": "Received SIGINT, shutting down"}), flush=True)
+            self.running = False
+            sys.exit(0)
+
+        # 注册信号处理器
+        if sys.platform == 'win32':
+            # Windows平台使用不同的信号处理方式
+            try:
+                signal.signal(signal.SIGTERM, handle_sigterm)
+                signal.signal(signal.SIGINT, handle_sigint)
+            except (AttributeError, ValueError) as e:
+                print(json.dumps({"status": "warning", "message": f"无法设置信号处理器: {str(e)}"}), flush=True)
+        else:
+            # Unix/Linux/MacOS平台
+            signal.signal(signal.SIGTERM, handle_sigterm)
+            signal.signal(signal.SIGINT, handle_sigint)
 
     def start(self):
         """启动IPC服务器"""
