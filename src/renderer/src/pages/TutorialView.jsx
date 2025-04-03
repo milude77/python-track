@@ -12,6 +12,7 @@ import api from '../api/index'
 import './TutorialView.scss'
 import MarkdownRenderer from '../components/MarkdownRenderer'
 import stringToUnicode from '../utils/unicode'
+import { monaco } from '../monaco-config'
 // 导入IPC API，用于状态持久化
 const { Title, Text } = Typography
 
@@ -56,7 +57,8 @@ const TutorialView = () => {
   const [hintLoading, setHintLoading] = useState(false) // 获取提示的加载状态
   const [solutionLoading, setSolutionLoading] = useState(false) // 查看解决方案的加载状态
   const [theme, setTheme] = useState(() => {
-    return document.documentElement.getAttribute('data-theme') === 'dark' ? 'vs-dark' : 'light'
+    const isDark = document.documentElement.getAttribute('data-theme') === 'dark'
+    return monaco.getThemeName(isDark)
   })
 
   // 加载已完成的练习列表
@@ -81,7 +83,8 @@ const TutorialView = () => {
       mutations.forEach((mutation) => {
         if (mutation.attributeName === 'data-theme') {
           const newTheme = document.documentElement.getAttribute('data-theme')
-          setTheme(newTheme === 'dark' ? 'vs-dark' : 'light')
+          const isDark = newTheme === 'dark'
+          setTheme(monaco.getThemeName(isDark))
         }
       })
     })
@@ -127,46 +130,6 @@ const TutorialView = () => {
 
   // 获取教程内容
   useEffect(() => {
-    const fetchTutorial = async () => {
-      setLoading(true)
-      try {
-        const response = await api.get(`/api/tutorial/${tutorialKey}`)
-        setTutorial(response.data)
-
-        // 从持久化存储中获取教程状态
-        if (window.ipcApi && window.ipcApi.getTutorialState) {
-          try {
-            const savedState = await window.ipcApi.getTutorialState(tutorialKey)
-            if (savedState) {
-              console.log(JSON.stringify(savedState))
-              // 使用保存的状态初始化代码编辑器
-              initializeCodeEditor(
-                response.data,
-                savedState.currentSectionIndex || 0,
-                savedState.currentCodeBlockIndex || 0
-              )
-            } else {
-              // 如果没有保存的状态，使用默认值
-              initializeCodeEditor(response.data, 0, 0)
-            }
-          } catch (stateError) {
-            console.error('获取保存的教程状态失败:', stateError)
-            // 出错时使用默认值
-            initializeCodeEditor(response.data, 0, 0)
-          }
-        } else {
-          // 如果IPC API不可用，使用默认值
-          initializeCodeEditor(response.data, 0, 0)
-        }
-
-        setLoading(false)
-      } catch (error) {
-        console.error('获取教程内容失败:', error)
-        message.error('获取教程内容失败')
-        setLoading(false)
-      }
-    }
-
     if (tutorialKey) {
       // 保存当前选中的教程
       if (window.ipcApi && window.ipcApi.setCurrentTutorial) {
@@ -174,7 +137,45 @@ const TutorialView = () => {
           console.error('保存当前教程失败:', error)
         })
       }
-      fetchTutorial()
+      ;(async () => {
+        setLoading(true)
+        try {
+          const response = await api.get(`/api/tutorial/${tutorialKey}`)
+          setTutorial(response.data)
+
+          // 从持久化存储中获取教程状态
+          if (window.ipcApi && window.ipcApi.getTutorialState) {
+            try {
+              const savedState = await window.ipcApi.getTutorialState(tutorialKey)
+              if (savedState) {
+                console.log(JSON.stringify(savedState))
+                // 使用保存的状态初始化代码编辑器
+                initializeCodeEditor(
+                  response.data,
+                  savedState.currentSectionIndex || 0,
+                  savedState.currentCodeBlockIndex || 0
+                )
+              } else {
+                // 如果没有保存的状态，使用默认值
+                initializeCodeEditor(response.data, 0, 0)
+              }
+            } catch (stateError) {
+              console.error('获取保存的教程状态失败:', stateError)
+              // 出错时使用默认值
+              initializeCodeEditor(response.data, 0, 0)
+            }
+          } else {
+            // 如果IPC API不可用，使用默认值
+            initializeCodeEditor(response.data, 0, 0)
+          }
+
+          setLoading(false)
+        } catch (error) {
+          console.error('获取教程内容失败:', error)
+          message.error('获取教程内容失败')
+          setLoading(false)
+        }
+      })()
     }
   }, [tutorialKey])
 
