@@ -26,6 +26,10 @@ const App = () => {
     // 如果都没有，使用系统默认值
     return window.matchMedia('(prefers-color-scheme: dark)').matches
   })
+  const [lastTutorialPath, setLastTutorialPath] = useState(() => {
+    const savedPath = localStorage.getItem('lastTutorialPath')
+    return savedPath || '/tutorial/基础知识'
+  })
 
   // 切换主题
   const toggleTheme = () => {
@@ -69,6 +73,19 @@ const App = () => {
 
     loadSavedTheme()
   }, [])
+  useEffect(() => {
+    const handleRouteChange = () => {
+      const currentPath = window.location.pathname
+      if (currentPath.startsWith('/tutorial/')) {
+        localStorage.setItem('lastTutorialPath', currentPath)
+        setLastTutorialPath(currentPath)
+      }
+    }
+
+    // 初始化时监听路由变化
+    const unsubscribe = window.router?.subscribe(handleRouteChange)
+    return () => unsubscribe?.()
+  }, [])
 
   return (
     <ConfigProvider
@@ -97,7 +114,7 @@ const App = () => {
             </div>
             <div className="content-container">
               <Routes>
-                <Route path="/" element={<Navigate to="/tutorial/基础知识" replace />} />
+                <Route path="/" element={<Navigate to={lastTutorialPath} replace />} />
                 <Route path="/tutorial/:tutorialKey" element={<TutorialView />} />
               </Routes>
             </div>
@@ -109,3 +126,4 @@ const App = () => {
 }
 
 export default App
+

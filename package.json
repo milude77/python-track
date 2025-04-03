@@ -47,6 +47,12 @@
         }
       ]
     },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true,
+      "installerIcon": "build/icons/icon.ico",
+      "uninstallerIcon": "build/icons/icon.ico"
+    },
     "linux": {
       "icon": "build/icons"
     },
@@ -91,6 +97,7 @@
     "vite": "^6.2.4"
   },
   "dependencies": {
-    "@monaco-editor/react": "^4.7.0"
+    "@monaco-editor/react": "^4.7.0",
+    "py-track": "file:"
   }
 }
