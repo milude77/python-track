@@ -18,6 +18,16 @@
 .sidebar-menu {
     background-color: var(--card-bg-color) !important;
     border-right: none !important;
+    
+    /* 选中项的蓝色高亮样式 */
+    .ant-menu-item-selected {
+        color: var(--primary-color) !important;
+    }
+    
+    /* 鼠标悬停时的样式 */
+    .ant-menu-item:hover:not(.ant-menu-item-selected) {
+        color: var(--primary-color) !important;
+    }
 }
 
 .sidebar-loading {

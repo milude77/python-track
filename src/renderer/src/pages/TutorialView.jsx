@@ -12,6 +12,7 @@ import api from '../api/index'
 import './TutorialView.scss'
 import MarkdownRenderer from '../components/MarkdownRenderer'
 import stringToUnicode from '../utils/unicode'
+// 导入IPC API，用于状态持久化
 const { Title, Text } = Typography
 
 function removeCommentsAndPrompt(code) {
@@ -58,6 +59,22 @@ const TutorialView = () => {
     return document.documentElement.getAttribute('data-theme') === 'dark' ? 'vs-dark' : 'light'
   })
 
+  // 加载已完成的练习列表
+  useEffect(() => {
+    ;(async () => {
+      try {
+        if (window.ipcApi && window.ipcApi.getCompletedExercises) {
+          const savedExercises = await window.ipcApi.getCompletedExercises()
+          if (savedExercises && savedExercises.length > 0) {
+            setCompletedExercises(savedExercises)
+          }
+        }
+      } catch (error) {
+        console.error('加载已完成练习列表失败:', error)
+      }
+    })()
+  }, [])
+
   // 监听主题变化
   useEffect(() => {
     const observer = new MutationObserver((mutations) => {
@@ -74,6 +91,40 @@ const TutorialView = () => {
     return () => observer.disconnect()
   }, [])
 
+  // 初始化代码编辑器内容的辅助函数
+  const initializeCodeEditor = (tutorialData, sectionIndex, blockIndex) => {
+    // 确保索引在有效范围内
+    const validSectionIndex = Math.min(sectionIndex, tutorialData['sections'].length - 1)
+
+    // 设置章节索引
+    setCurrentSectionIndex(validSectionIndex)
+
+    // 检查该章节是否有代码块
+    if (
+      tutorialData['sections'][validSectionIndex] &&
+      tutorialData['sections'][validSectionIndex]['code_blocks'] &&
+      tutorialData['sections'][validSectionIndex]['code_blocks'].length > 0
+    ) {
+      // 确保代码块索引在有效范围内
+      const validBlockIndex = Math.min(
+        blockIndex,
+        tutorialData['sections'][validSectionIndex]['code_blocks'].length - 1
+      )
+
+      // 设置代码块索引
+      setCurrentCodeBlockIndex(validBlockIndex)
+
+      // 设置代码编辑器内容
+      setCode(
+        addHashToLines(tutorialData['sections'][validSectionIndex]['code_blocks'][validBlockIndex])
+      )
+    } else {
+      // 如果没有代码块，重置代码块索引和代码内容
+      setCurrentCodeBlockIndex(0)
+      setCode('')
+    }
+  }
+
   // 获取教程内容
   useEffect(() => {
     const fetchTutorial = async () => {
@@ -81,13 +132,31 @@ const TutorialView = () => {
       try {
         const response = await api.get(`/api/tutorial/${tutorialKey}`)
         setTutorial(response.data)
-        // 重置子章节索引
-        setCurrentSectionIndex(0)
-        // 重置代码块索引
-        setCurrentCodeBlockIndex(0)
-        // 如果有代码块，设置初始代码
-        if (response.data.sections.length > 0 && response.data.sections[0].code_blocks.length > 0) {
-          setCode(addHashToLines(response.data.sections[0].code_blocks[0]))
+
+        // 从持久化存储中获取教程状态
+        if (window.ipcApi && window.ipcApi.getTutorialState) {
+          try {
+            const savedState = await window.ipcApi.getTutorialState(tutorialKey)
+            if (savedState) {
+              console.log(JSON.stringify(savedState))
+              // 使用保存的状态初始化代码编辑器
+              initializeCodeEditor(
+                response.data,
+                savedState.currentSectionIndex || 0,
+                savedState.currentCodeBlockIndex || 0
+              )
+            } else {
+              // 如果没有保存的状态，使用默认值
+              initializeCodeEditor(response.data, 0, 0)
+            }
+          } catch (stateError) {
+            console.error('获取保存的教程状态失败:', stateError)
+            // 出错时使用默认值
+            initializeCodeEditor(response.data, 0, 0)
+          }
+        } else {
+          // 如果IPC API不可用，使用默认值
+          initializeCodeEditor(response.data, 0, 0)
         }
 
         setLoading(false)
@@ -99,6 +168,12 @@ const TutorialView = () => {
     }
 
     if (tutorialKey) {
+      // 保存当前选中的教程
+      if (window.ipcApi && window.ipcApi.setCurrentTutorial) {
+        window.ipcApi.setCurrentTutorial(tutorialKey).catch((error) => {
+          console.error('保存当前教程失败:', error)
+        })
+      }
       fetchTutorial()
     }
   }, [tutorialKey])
@@ -113,21 +188,36 @@ const TutorialView = () => {
       const response = await api.post('/api/run-code', {
         code: stringToUnicode(code),
         expected_code: stringToUnicode(
-          tutorial.sections[currentSectionIndex].code_blocks[currentCodeBlockIndex]
+          tutorial['sections'][currentSectionIndex]['code_blocks'][currentCodeBlockIndex]
         )
       })
 
       setOutput(response.data.output)
       setOutputStatus(response.data.success ? 'success' : 'error')
 
-      if (response.data.ai_evaluation) {
-        setEvaluation(response.data.ai_evaluation)
+      if (response.data['ai_evaluation']) {
+        setEvaluation(response.data['ai_evaluation'])
 
         // 如果代码通过评估，标记为已完成
-        if (response.data.ai_evaluation.passed) {
+        if (response.data['ai_evaluation'].passed) {
           const exerciseKey = `${tutorialKey}-${currentSectionIndex}-${currentCodeBlockIndex}`
           if (!completedExercises.includes(exerciseKey)) {
-            setCompletedExercises([...completedExercises, exerciseKey])
+            // 更新本地状态
+            const updatedExercises = [...completedExercises, exerciseKey]
+            setCompletedExercises(updatedExercises)
+
+            // 保存到持久化存储
+            if (window.ipcApi && window.ipcApi.addCompletedExercise) {
+              window.ipcApi
+                .addCompletedExercise(exerciseKey)
+                .then(() => {
+                  console.log('已保存练习完成状态')
+                })
+                .catch((error) => {
+                  console.error('保存练习完成状态失败:', error)
+                })
+            }
+
             message.success('恭喜！你已完成这个练习！')
           }
         }
@@ -146,7 +236,7 @@ const TutorialView = () => {
       const response = await api.post('/api/hint', {
         code: stringToUnicode(removeCommentsAndPrompt(code)),
         expected_code: stringToUnicode(
-          tutorial.sections[currentSectionIndex].code_blocks[currentCodeBlockIndex]
+          tutorial['sections'][currentSectionIndex]['code_blocks'][currentCodeBlockIndex]
         ),
         actual_output: stringToUnicode(output)
       })
@@ -167,12 +257,12 @@ const TutorialView = () => {
       const response = await api.post('/api/solution', {
         code: stringToUnicode(code),
         expected_code: stringToUnicode(
-          tutorial.sections[currentSectionIndex].code_blocks[currentCodeBlockIndex]
+          tutorial['sections'][currentSectionIndex]['code_blocks'][currentCodeBlockIndex]
         ),
         actual_output: stringToUnicode(output)
       })
 
-      setCode(removePythonCodeBlockSyntax(response.data.solution))
+      setCode(removePythonCodeBlockSyntax(response.data['solution']))
       message.success('已加载解决方案')
     } catch (error) {
       console.error('获取解决方案失败:', error)
@@ -184,31 +274,54 @@ const TutorialView = () => {
 
   // 切换章节
   const handleSectionChange = (sectionIndex) => {
-    setCurrentSectionIndex(sectionIndex)
-    setCurrentCodeBlockIndex(0)
+    // 使用辅助函数初始化代码编辑器，章节变化时代码块索引重置为0
+    initializeCodeEditor(tutorial, sectionIndex, 0)
 
-    if (tutorial.sections[sectionIndex].code_blocks.length > 0) {
-      setCode(addHashToLines(tutorial.sections[sectionIndex].code_blocks[0]))
-    } else {
-      setCode('')
-    }
-
+    // 重置输出和状态
     setOutput('')
     setOutputStatus('idle')
     setEvaluation(null)
     setHintLoading(false)
     setSolutionLoading(false)
+
+    // 保存当前章节状态，包括所有索引
+    if (window.ipcApi && window.ipcApi.setTutorialState && tutorialKey) {
+      window.ipcApi
+        .setTutorialState(tutorialKey, {
+          currentSectionIndex: sectionIndex,
+          currentSubSectionIndex: 0,
+          currentCodeBlockIndex: 0,
+          sectionCodeBlockIndex: 0,
+          subSectionCodeBlockIndex: 0
+        })
+        .catch((error) => {
+          console.error('保存章节状态失败:', error)
+        })
+    }
   }
 
   // 切换代码块
   const handleCodeBlockChange = (blockIndex) => {
-    setCurrentCodeBlockIndex(blockIndex)
-    setCode(addHashToLines(tutorial.sections[currentSectionIndex].code_blocks[blockIndex]))
+    // 使用辅助函数初始化代码编辑器，保持当前章节不变
+    initializeCodeEditor(tutorial, currentSectionIndex, blockIndex)
+
     setOutput('')
     setOutputStatus('idle')
     setEvaluation(null)
     setHintLoading(false)
     setSolutionLoading(false)
+
+    // 保存当前代码块状态，包括所有索引
+    if (window.ipcApi && window.ipcApi.setTutorialState && tutorialKey) {
+      window.ipcApi
+        .setTutorialState(tutorialKey, {
+          currentSectionIndex,
+          currentCodeBlockIndex: blockIndex
+        })
+        .catch((error) => {
+          console.error('保存代码块状态失败:', error)
+        })
+    }
   }
 
   // 渲染章节内容
@@ -220,7 +333,7 @@ const TutorialView = () => {
 
   // 渲染代码块选择器
   const renderCodeBlockSelector = (section) => {
-    if (!section.code_blocks || section.code_blocks.length === 0) {
+    if (!section['code_blocks'] || section['code_blocks'].length === 0) {
       return <Alert message="本章节没有代码练习" type="info" />
     }
 
@@ -228,7 +341,7 @@ const TutorialView = () => {
       <div className="code-block-selector">
         <Title level={4}>代码练习</Title>
         <Space wrap>
-          {section.code_blocks.map((_, index) => {
+          {section['code_blocks'].map((_, index) => {
             const exerciseKey = `${tutorialKey}-${currentSectionIndex}-${index}`
             const isCompleted = completedExercises.includes(exerciseKey)
 
@@ -266,9 +379,9 @@ const TutorialView = () => {
       <Title level={2}>{tutorial.title}</Title>
 
       <Tabs
-        defaultActiveKey="0"
+        activeKey={String(currentSectionIndex)}
         onChange={handleSectionChange}
-        items={tutorial.sections.map((section, index) => ({
+        items={tutorial['sections'].map((section, index) => ({
           key: String(index),
           label: section.title,
           children: (
@@ -276,7 +389,7 @@ const TutorialView = () => {
               {renderSectionContent(section)}
               {renderCodeBlockSelector(section)}
 
-              {section.code_blocks && section.code_blocks.length > 0 && (
+              {section['code_blocks'] && section['code_blocks'].length > 0 && (
                 <div className="code-practice-area">
                   <div className="code-editor-container">
                     <Editor
@@ -318,7 +431,7 @@ const TutorialView = () => {
 
                   {output && (
                     <div className={`code-output ${outputStatus}`}>
-                      <p3>输出结果</p3>
+                      <Text className="output-tag">输出结果</Text>
                       <pre>{output.trim()}</pre>
                     </div>
                   )}
@@ -355,14 +468,23 @@ const TutorialView = () => {
         <Title level={4}>学习进度</Title>
         <Card>
           <div className="progress-stats">
-            <div className="stat-item">
-              <Badge count={completedExercises.length} overflowCount={999} />
-              <Text>已完成练习</Text>
-            </div>
+            {completedExercises.filter((exercise) => exercise.startsWith(`${tutorialKey}-`))
+              .length > 0 && (
+              <div className="stat-item">
+                <Badge
+                  count={
+                    completedExercises.filter((exercise) => exercise.startsWith(`${tutorialKey}-`))
+                      .length
+                  }
+                  overflowCount={999}
+                />
+                <Text>已完成练习</Text>
+              </div>
+            )}
             <div className="stat-item">
               <Badge
-                count={tutorial.sections.reduce((total, section) => {
-                  return total + (section.code_blocks ? section.code_blocks.length : 0)
+                count={tutorial['sections'].reduce((total, section) => {
+                  return total + (section['code_blocks'] ? section['code_blocks'].length : 0)
                 }, 0)}
                 style={{ backgroundColor: '#52c41a' }}
               />

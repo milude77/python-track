@@ -19,7 +19,7 @@ const MarkdownRenderer = ({ content }) => {
   const containerRef = useRef(null)
 
   const baseStyle = {
-    color: token.colorText,
+    color: token['colorText'],
     fontFamily: "'Poppins', sans-serif"
   }
 
@@ -150,10 +150,10 @@ const MarkdownRenderer = ({ content }) => {
         position: 'absolute',
         top: '8px',
         right: '12px',
-        color: token.colorText,
+        color: token['colorText'],
         fontSize: '0.8em',
         border: 'none',
-        background: token.colorBgElevated,
+        background: token['colorBgElevated'],
         padding: '2px 8px',
         borderRadius: '4px',
         cursor: 'pointer',
@@ -237,6 +237,7 @@ const MarkdownRenderer = ({ content }) => {
           th: ({ children }) => <th style={tableHeaderStyle}>{children}</th>,
           code({ className, children, inline, ...props }) {
             const language = className?.replace('language-', '') || ''
+            console.log('current inline:' + inline)
             return language ? (
               <pre
                 className={`language-${language}`}
@@ -254,12 +255,12 @@ const MarkdownRenderer = ({ content }) => {
             ) : (
               <code
                 style={{
-                  backgroundColor: token.colorBgTextHover,
+                  backgroundColor: token['colorBgTextHover'],
                   padding: '2px 4px',
                   borderRadius: '4px',
                   fontSize: '1em',
                   fontFamily: 'monospace',
-                  color: token.colorText
+                  color: token['colorText']
                 }}
                 {...props}
               >

@@ -4,6 +4,7 @@ import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
 import { spawn } from 'child_process'
 import fs from 'fs'
+import stateStore from './store'
 // 存储Python进程引用
 let pythonProcess = null
 // 存储待处理的IPC请求
@@ -82,8 +83,8 @@ function startPythonIpcServer() {
           if (response.status === 'stream_start') {
             // 初始化流缓冲区
             streamBuffers.set(response.requestId, {
-              chunks: new Array(response.total_chunks).fill(''),
-              total: response.total_chunks,
+              chunks: new Array(response['total_chunks']).fill(''),
+              total: response['total_chunks'],
               received: 0,
               completed: false // 添加标志表示是否已完成
             })
@@ -91,7 +92,7 @@ function startPythonIpcServer() {
             // 存储数据块
             const buffer = streamBuffers.get(response.requestId)
             if (buffer && !buffer.completed) {
-              buffer.chunks[response.chunk_index] = response.chunk_data
+              buffer.chunks[response['chunk_index']] = response['chunk_data']
               buffer.received++
 
               // 检查是否所有块都已接收
@@ -271,17 +272,19 @@ function createWindow() {
             // 确保使用/t参数终止所有子进程
             execSync(`taskkill /pid ${pythonProcess.pid} /f /t`)
             console.log(`窗口关闭前已强制终止Python进程及其子进程(PID: ${pythonProcess.pid})`)
-            
+
             // 等待一小段时间确保进程完全终止
             setTimeout(() => {
               // 检查进程是否仍然存在
               try {
                 execSync(`tasklist /fi "pid eq ${pythonProcess.pid}" /fo csv /nh`)
-                console.warn(`窗口关闭前Python进程(PID: ${pythonProcess.pid})可能仍在运行，尝试再次终止`)
+                console.warn(
+                  `窗口关闭前Python进程(PID: ${pythonProcess.pid})可能仍在运行，尝试再次终止`
+                )
                 execSync(`taskkill /pid ${pythonProcess.pid} /f /t`)
               } catch (checkError) {
                 // 如果tasklist命令失败，说明进程已经不存在
-                console.log(`窗口关闭前确认Python进程(PID: ${pythonProcess.pid})已终止`)
+                console.log(`窗口关闭前确认Python进程(PID: ${pythonProcess.pid})已终止`, checkError)
               }
             }, 500)
           } catch (e) {
@@ -407,10 +410,50 @@ app.whenReady().then(() => {
     })
   })
 
+  // 处理状态持久化相关的IPC请求
+  ipcMain.handle('get-state', (event, key) => {
+    switch (key) {
+      case 'currentTutorial':
+        return stateStore.getCurrentTutorial()
+      case 'tutorialState': {
+        const tutorialKey = event.sender['tutorialKey']
+        return stateStore.getTutorialState(tutorialKey)
+      }
+      case 'completedExercises':
+        return stateStore.getCompletedExercises()
+      case 'theme':
+        return stateStore.getTheme()
+      default:
+        return null
+    }
+  })
+
+  ipcMain.handle('set-current-tutorial', (event, tutorialKey) => {
+    stateStore.setCurrentTutorial(tutorialKey)
+    // 保存当前教程键，以便在get-state请求中使用
+    event.sender.tutorialKey = tutorialKey
+    return true
+  })
+
+  ipcMain.handle('set-tutorial-state', (event, { tutorialKey, state }) => {
+    stateStore.setTutorialState(tutorialKey, state)
+    return true
+  })
+
+  ipcMain.handle('add-completed-exercise', (event, exerciseId) => {
+    stateStore.addCompletedExercise(exerciseId)
+    return stateStore.getCompletedExercises()
+  })
+
+  ipcMain.handle('set-theme', (event, theme) => {
+    stateStore.setTheme(theme)
+    return true
+  })
+
   createWindow()
 
   app.on('activate', function () {
-    // On macOS it's common to re-create a window in the app when the
+    // On macOS, it's common to re-create a window in the app when the
     // dock icon is clicked and there are no other windows open.
     if (BrowserWindow.getAllWindows().length === 0) createWindow()
   })
@@ -431,7 +474,7 @@ app.on('window-all-closed', () => {
             // 确保使用/t参数终止所有子进程
             execSync(`taskkill /pid ${pythonProcess.pid} /f /t`)
             console.log(`已强制终止Python进程及其子进程(PID: ${pythonProcess.pid})`)
-            
+
             // 等待一小段时间确保进程完全终止
             setTimeout(() => {
               // 检查进程是否仍然存在
@@ -441,7 +484,7 @@ app.on('window-all-closed', () => {
                 execSync(`taskkill /pid ${pythonProcess.pid} /f /t`)
               } catch (checkError) {
                 // 如果tasklist命令失败，说明进程已经不存在
-                console.log(`确认Python进程(PID: ${pythonProcess.pid})已终止`)
+                console.log(`确认Python进程(PID: ${pythonProcess.pid})已终止`, checkError)
               }
             }, 500)
           } catch (e) {
@@ -471,17 +514,19 @@ app.on('quit', () => {
           // 确保使用/t参数终止所有子进程
           execSync(`taskkill /pid ${pythonProcess.pid} /f /t`)
           console.log(`应用退出时已强制终止Python进程及其子进程(PID: ${pythonProcess.pid})`)
-          
+
           // 等待一小段时间确保进程完全终止
           setTimeout(() => {
             // 检查进程是否仍然存在
             try {
               execSync(`tasklist /fi "pid eq ${pythonProcess.pid}" /fo csv /nh`)
-              console.warn(`应用退出时Python进程(PID: ${pythonProcess.pid})可能仍在运行，尝试再次终止`)
+              console.warn(
+                `应用退出时Python进程(PID: ${pythonProcess.pid})可能仍在运行，尝试再次终止`
+              )
               execSync(`taskkill /pid ${pythonProcess.pid} /f /t`)
             } catch (checkError) {
               // 如果tasklist命令失败，说明进程已经不存在
-              console.log(`应用退出时确认Python进程(PID: ${pythonProcess.pid})已终止`)
+              console.log(`应用退出时确认Python进程(PID: ${pythonProcess.pid})已终止`, checkError)
             }
           }, 500)
         } catch (e) {

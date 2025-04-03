@@ -61,18 +61,12 @@
 
 .code-output {
   margin-top: 16px;
-  padding: 2px 16px 16px 16px;
+  padding: 10px 16px;
   border-radius: 8px;
   font-family: 'Source Code Pro', monospace;
   white-space: pre-wrap;
   overflow-x: auto;
   transition: all var(--transition-duration);
-
-  .p3 {
-    font-family: 'Microsoft YaHei', serif;
-    font-weight: 700;
-    color: var(--success-color);
-  }
 
   pre {
     margin: 0;
@@ -82,11 +76,21 @@
   &.success {
     background-color: rgba(82, 196, 26, 0.1);
     border: 1px solid var(--success-color);
+    .output-tag {
+      font-family: 'Microsoft YaHei', serif;
+      font-weight: 700;
+      color: var(--success-color);
+    }
   }
 
   &.error {
     background-color: rgba(255, 77, 79, 0.1);
     border: 1px solid var(--error-color);
+    .output-tag {
+      font-family: 'Microsoft YaHei', serif;
+      font-weight: 700;
+      color: var(--error-color);
+    }
   }
 }
 

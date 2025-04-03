@@ -47,6 +47,48 @@ const ipcApi = {
   // 窗口控制 - 关闭
   closeWindow: () => {
     ipcRenderer.send('window-control', 'close')
+  },
+
+  // 状态持久化相关API
+  // 获取当前选中的教程
+  getCurrentTutorial: async () => {
+    return ipcRenderer.invoke('get-state', 'currentTutorial')
+  },
+
+  // 设置当前选中的教程
+  setCurrentTutorial: async (tutorialKey) => {
+    return ipcRenderer.invoke('set-current-tutorial', tutorialKey)
+  },
+
+  // 获取教程状态
+  getTutorialState: async (tutorialKey) => {
+    await ipcRenderer.invoke('set-current-tutorial', tutorialKey) // 先设置当前教程
+    return ipcRenderer.invoke('get-state', 'tutorialState')
+  },
+
+  // 设置教程状态
+  setTutorialState: async (tutorialKey, state) => {
+    return ipcRenderer.invoke('set-tutorial-state', { tutorialKey, state })
+  },
+
+  // 获取已完成的练习
+  getCompletedExercises: async () => {
+    return ipcRenderer.invoke('get-state', 'completedExercises')
+  },
+
+  // 添加已完成的练习
+  addCompletedExercise: async (exerciseId) => {
+    return ipcRenderer.invoke('add-completed-exercise', exerciseId)
+  },
+
+  // 获取主题设置
+  getTheme: async () => {
+    return ipcRenderer.invoke('get-state', 'theme')
+  },
+
+  // 设置主题
+  setTheme: async (theme) => {
+    return ipcRenderer.invoke('set-theme', theme)
   }
 }
 

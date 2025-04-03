@@ -1,5 +1,10 @@
 import { Layout, Typography, Button } from 'antd'
-import { MinusOutlined, BorderOutlined, CloseOutlined, FullscreenExitOutlined } from '@ant-design/icons'
+import {
+  MinusOutlined,
+  BorderOutlined,
+  CloseOutlined,
+  FullscreenExitOutlined
+} from '@ant-design/icons'
 import './AppHeader.scss'
 import icon from '../../../../resources/python-logo.svg?asset'
 import { useState, useEffect } from 'react'
@@ -49,18 +54,27 @@ const AppHeader = () => {
         </Title>
       </div>
       <div className="window-controls">
-        <Button type="text" icon={<MinusOutlined />} onClick={handleMinimize} className="window-control-btn" />
+        <Button
+          type="text"
+          icon={<MinusOutlined />}
+          onClick={handleMinimize}
+          className="window-control-btn"
+        />
         <Button
           type="text"
           icon={isMaximized ? <FullscreenExitOutlined /> : <BorderOutlined />}
           onClick={handleMaximize}
           className="window-control-btn"
         />
-        <Button type="text" icon={<CloseOutlined />} onClick={handleClose} className="window-control-btn close-btn" />
+        <Button
+          type="text"
+          icon={<CloseOutlined />}
+          onClick={handleClose}
+          className="window-control-btn close-btn"
+        />
       </div>
     </Header>
   )
-
 }
 
 export default AppHeader
