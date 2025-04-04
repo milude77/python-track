@@ -24,61 +24,40 @@ const oneLight = {
   inherit: true, // 继承基础主题的规则
   rules: [
     // 基本语法元素
-    { token: '', foreground: '383a42' }, // 默认文本颜色 (--syntax-fg)
-    { token: 'comment', foreground: '9d9d9f', fontStyle: 'italic' }, // 注释 (--mono-3)
-    { token: 'keyword', foreground: 'a626a4' }, // 关键字 (--hue-3)
-    { token: 'operator', foreground: 'a626a4' }, // 操作符 (--hue-3)
-    { token: 'string', foreground: '50a14f' }, // 字符串 (--hue-4)
-    { token: 'string.escape', foreground: '50a14f' }, // 转义字符
-    { token: 'constant', foreground: 'c18401' }, // 常量 (--hue-6)
-    { token: 'variable', foreground: '4078f2' }, // 变量 (--hue-2)
-    { token: 'variable.parameter', foreground: '383a42' }, // 参数变量
-    { token: 'variable.language', foreground: 'a626a4' }, // 语言变量 (this, self等)
-    { token: 'function', foreground: '4078f2' }, // 函数 (--hue-2)
-    { token: 'number', foreground: 'c18401' }, // 数字 (--hue-6)
-    { token: 'boolean', foreground: 'c18401' }, // 布尔值 (--hue-6)
-    { token: 'regexp', foreground: '50a14f' }, // 正则表达式 (--hue-4)
+    { token: '', foreground: '#383a42' }, // 默认文本颜色 (--syntax-fg)
+    { token: 'comment', foreground: '#9d9d9f', fontStyle: 'italic' }, // 注释 (--mono-3)
+    { token: 'keyword', foreground: '#a626a4' }, // 关键字 (--hue-3)
+    { token: 'operator', foreground: '#a626a4' }, // 操作符 (--hue-3)
+    { token: 'string', foreground: '#50a14f' }, // 字符串 (--hue-4)
+    { token: 'string.escape', foreground: '#50a14f' }, // 转义字符
+    { token: 'constant', foreground: '#c18401' }, // 常量 (--hue-6)
+    { token: 'variable', foreground: '#4078f2' }, // 变量 (--hue-2)
+    { token: 'variable.parameter', foreground: '#383a42' }, // 参数变量
+    { token: 'variable.language', foreground: '#a626a4' }, // 语言变量 (this, self等)
+    { token: 'function', foreground: '#4078f2' }, // 函数 (--hue-2)
+    { token: 'number', foreground: '#c18401' }, // 数字 (--hue-6)
+    { token: 'regexp', foreground: '#50a14f' }, // 正则表达式 (--hue-4)
 
     // 标记和标签
-    { token: 'tag', foreground: 'e45649' }, // 标签 (--hue-5)
-    { token: 'tag.attribute.name', foreground: 'c18401' }, // 属性名 (--hue-6)
-    { token: 'attribute.name', foreground: 'c18401' }, // 属性名 (--hue-6)
-    { token: 'attribute.value', foreground: '50a14f' }, // 属性值 (--hue-4)
+    { token: 'tag', foreground: '#e45649' }, // 标签 (--hue-5)
+    { token: 'tag.attribute.name', foreground: '#c18401' }, // 属性名 (--hue-6)
+    { token: 'attribute.name', foreground: '#c18401' }, // 属性名 (--hue-6)
+    { token: 'attribute.value', foreground: '#50a14f' }, // 属性值 (--hue-4)
 
-    // 特定语言
     // Python
-    { token: 'keyword.control.python', foreground: 'a626a4' }, // Python控制关键字
-    { token: 'keyword.python', foreground: 'a626a4' }, // Python关键字
-    { token: 'support.function.python', foreground: '4078f2' }, // Python内置函数
-    { token: 'builtin.python', foreground: '4078f2' }, // Python内置函数(另一种token名)
-    { token: 'support.type.python', foreground: 'c18401' }, // Python内置类型
-    { token: 'support.variable.magic.python', foreground: 'e45649' }, // Python魔术变量
-    { token: 'constant.language.python', foreground: 'c18401' }, // Python语言常量(True/False/None)
-    { token: 'boolean.python', foreground: 'c18401' }, // Python布尔值(另一种token名)
-
-    // JavaScript
-    { token: 'identifier.js', foreground: '383a42' }, // JS标识符
-    { token: 'keyword.operator.new.js', foreground: 'a626a4' }, // JS new操作符
-
-    // JSON
-    { token: 'string.key.json', foreground: 'e45649' }, // JSON键
-    { token: 'string.value.json', foreground: '50a14f' }, // JSON值
-
-    // CSS
-    { token: 'entity.name.selector.css', foreground: 'e45649' }, // CSS选择器
-    { token: 'support.type.property-name.css', foreground: '383a42' }, // CSS属性名
-    { token: 'meta.property-value.css', foreground: '0184bc' }, // CSS属性值
-    { token: 'entity.other.attribute-name.class.css', foreground: 'c18401' }, // CSS类
-
-    // HTML
-    { token: 'entity.name.tag.html', foreground: 'e45649' }, // HTML标签
-    { token: 'entity.other.attribute-name.html', foreground: 'c18401' }, // HTML属性
-
-    // Markdown
-    { token: 'markup.heading.markdown', foreground: 'e45649' }, // Markdown标题
-    { token: 'markup.inline.raw.markdown', foreground: '50a14f' }, // Markdown内联代码
-    { token: 'markup.bold.markdown', foreground: 'c18401', fontStyle: 'bold' }, // Markdown粗体
-    { token: 'markup.italic.markdown', foreground: 'a626a4', fontStyle: 'italic' } // Markdown斜体
+    { token: 'keyword.python', foreground: '#c678dd' }, // Python关键字
+    { token: 'identifier.python', foreground: '#383a42' }, // Python标识符
+    { token: 'delimiter.python', foreground: '#abb2bf' }, // Python分隔符
+    { token: 'delimiter.parenthesis.python', foreground: '#abb2bf' }, // Python括号
+    { token: 'delimiter.curly.python', foreground: '#abb2bf' }, // Python大括号
+    { token: 'delimiter.bracket.python', foreground: '#abb2bf' }, // Python方括号
+    { token: 'white.python', foreground: '#abb2bf' }, // Python空白
+    { token: 'comment.python', foreground: '#5c6370', fontStyle: 'italic' }, // Python注释
+    { token: 'string.python', foreground: '#98c379' }, // Python字符串
+    { token: 'string.escape.python', foreground: '#56b6c2' }, // Python字符串转义
+    { token: 'number.python', foreground: '#d19a66' }, // Python数字
+    { token: 'number.hex.python', foreground: '#d19a66' }, // Python十六进制数字
+    { token: 'tag.python', foreground: '#e06c75' } // Python装饰器
   ],
   colors: {
     // 编辑器基础颜色
