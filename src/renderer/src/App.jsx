@@ -77,13 +77,25 @@ const App = () => {
     const handleRouteChange = () => {
       const currentPath = window.location.pathname
       if (currentPath.startsWith('/tutorial/')) {
+        // 保存到localStorage（向后兼容）
         localStorage.setItem('lastTutorialPath', currentPath)
         setLastTutorialPath(currentPath)
+
+        // 从路径中提取教程键
+        const tutorialKey = currentPath.replace('/tutorial/', '')
+        // 同时保存到electron-store
+        if (window.ipcApi && window.ipcApi.setCurrentTutorial) {
+          window.ipcApi.setCurrentTutorial(tutorialKey).catch((error) => {
+            console.error('保存当前教程失败:', error)
+          })
+        }
       }
     }
 
     // 初始化时监听路由变化
     const unsubscribe = window.router?.subscribe(handleRouteChange)
+    // 初始化时也执行一次，确保当前路径被保存
+    handleRouteChange()
     return () => unsubscribe?.()
   }, [])
 
@@ -126,4 +138,3 @@ const App = () => {
 }
 
 export default App
-

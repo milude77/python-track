@@ -45,10 +45,17 @@ const Sidebar = () => {
     })()
   }, [navigate, tutorialKey])
 
-  // 当URL中的tutorialKey变化时，更新selectedKey
+  // 当URL中的tutorialKey变化时，更新selectedKey并保存到electron-store
   useEffect(() => {
     if (tutorialKey) {
       setSelectedKey(tutorialKey)
+
+      // 保存当前选中的教程到electron-store
+      if (window.ipcApi && window.ipcApi.setCurrentTutorial) {
+        window.ipcApi.setCurrentTutorial(tutorialKey).catch((error) => {
+          console.error('保存当前教程失败:', error)
+        })
+      }
     }
   }, [tutorialKey])
 

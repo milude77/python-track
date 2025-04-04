@@ -132,11 +132,6 @@ const TutorialView = () => {
   useEffect(() => {
     if (tutorialKey) {
       // 保存当前选中的教程
-      if (window.ipcApi && window.ipcApi.setCurrentTutorial) {
-        window.ipcApi.setCurrentTutorial(tutorialKey).catch((error) => {
-          console.error('保存当前教程失败:', error)
-        })
-      }
       ;(async () => {
         setLoading(true)
         try {

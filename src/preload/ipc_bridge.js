@@ -62,8 +62,7 @@ const ipcApi = {
 
   // 获取教程状态
   getTutorialState: async (tutorialKey) => {
-    await ipcRenderer.invoke('set-current-tutorial', tutorialKey) // 先设置当前教程
-    return ipcRenderer.invoke('get-state', 'tutorialState')
+    return ipcRenderer.invoke('get-state', 'tutorialState', tutorialKey)
   },
 
   // 设置教程状态

@@ -411,13 +411,18 @@ app.whenReady().then(() => {
   })
 
   // 处理状态持久化相关的IPC请求
-  ipcMain.handle('get-state', (event, key) => {
+  ipcMain.handle('get-state', (event, key, tutorialKey) => {
     switch (key) {
       case 'currentTutorial':
         return stateStore.getCurrentTutorial()
       case 'tutorialState': {
-        const tutorialKey = event.sender['tutorialKey']
-        return stateStore.getTutorialState(tutorialKey)
+        // 使用传入的tutorialKey参数，而不是依赖event.sender中的值
+        const keyToUse = tutorialKey || event.sender['tutorialKey']
+        if (!keyToUse) {
+          console.warn('获取教程状态失败: 未提供tutorialKey')
+          return null
+        }
+        return stateStore.getTutorialState(keyToUse)
       }
       case 'completedExercises':
         return stateStore.getCompletedExercises()
