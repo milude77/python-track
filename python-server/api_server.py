@@ -69,8 +69,8 @@ def extract_sections(md_content):
 
 def run_code(code):
     """运行用户输入的代码并捕获输出和错误"""
-    # 创建一个临时的本地命名空间
-    local_vars = {}
+    # 创建一个临时的命名空间，同时用于全局和本地
+    namespace = {}
     
     try:
         # 重定向标准输出以捕获print输出
@@ -79,13 +79,13 @@ def run_code(code):
         
         f = io.StringIO()
         with redirect_stdout(f):
-            exec(code, globals(), local_vars)
+            exec(code, namespace, namespace)
         
         output = f.getvalue()
-        return {"success": True, "output": output, "vars": local_vars}
+        return {"success": True, "output": output, "vars": namespace}
     except Exception as e:
         error_msg = traceback.format_exc()
-        return {"success": False, "output": error_msg, "vars": local_vars}
+        return {"success": False, "output": error_msg, "vars": namespace}
 
 
 @app.route('/api/tutorials', methods=['GET'])
