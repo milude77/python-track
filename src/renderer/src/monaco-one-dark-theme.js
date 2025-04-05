@@ -32,7 +32,7 @@ const oneDark = {
     { token: 'attribute.name', foreground: '#d19a66' }, // 属性名
     { token: 'attribute.value', foreground: '#98c379' }, // 属性值
 
-    // Python - 根据python.test.ts中的token规则更新
+    // Python - 根据monaco-python-language.js中的token规则更新
     { token: 'keyword.python', foreground: '#c678dd' }, // Python关键字
     { token: 'identifier.python', foreground: '#61afef' }, // Python标识符
     { token: 'delimiter.python', foreground: '#abb2bf' }, // Python分隔符
@@ -45,7 +45,14 @@ const oneDark = {
     { token: 'string.escape.python', foreground: '#56b6c2' }, // Python字符串转义
     { token: 'number.python', foreground: '#d19a66' }, // Python数字
     { token: 'number.hex.python', foreground: '#d19a66' }, // Python十六进制数字
-    { token: 'tag.python', foreground: '#e06c75' } // Python装饰器
+    { token: 'tag.python', foreground: '#e06c75' }, // Python装饰器
+    { token: 'function.python', foreground: '#61afef' }, // Python内置函数
+    { token: 'constant.python', foreground: '#d19a66' }, // Python常量
+    { token: 'operator.python', foreground: '#c678dd' }, // Python操作符
+    { token: 'type.identifier', foreground: '#c18401' }, // Python类名 - 黄色高亮
+    { token: 'method.name', foreground: '#4078f2' }, // Python方法名 - 蓝色高亮
+    { token: 'keyword.def', foreground: '#a626a4' }, // def 关键字
+    { token: 'template.content', foreground: '#383a42' } // 模板字符串内容
   ],
   colors: {
     // 编辑器基础颜色

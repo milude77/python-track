@@ -1,6 +1,7 @@
 // Monaco编辑器配置文件
 import oneLightTheme from './monaco-one-light-theme'
 import oneDarkTheme from './monaco-one-dark-theme'
+import initPythonLanguage from './monaco-python-language'
 
 const monaco = {
   init: () => {
@@ -17,6 +18,8 @@ const monaco = {
         // 注册自定义主题
         window.monaco.editor.defineTheme('one-light', oneLightTheme)
         window.monaco.editor.defineTheme('one-dark', oneDarkTheme)
+        // 初始化Python语言定义，包括自定义语法高亮规则
+        initPythonLanguage()
       })
     }
     document.body.appendChild(script)
