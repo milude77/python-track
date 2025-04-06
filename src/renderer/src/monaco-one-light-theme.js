@@ -53,6 +53,7 @@ const oneLight = {
     { token: 'delimiter.bracket.python', foreground: '#abb2bf' }, // Python方括号
     { token: 'comment.python', foreground: '#5c6370', fontStyle: 'italic' }, // Python注释
     { token: 'string.python', foreground: '#50a14f' }, // Python字符串
+    { token: 'string.prefix.python', foreground: '#50a14f' },
     { token: 'string.escape.python', foreground: '#56b6c2' }, // Python字符串转义
     { token: 'function.python', foreground: '#50a14f' },
     { token: 'number.python', foreground: '#d19a66' }, // Python数字

@@ -42,6 +42,7 @@ const oneDark = {
     { token: 'white.python', foreground: '#abb2bf' }, // Python空白
     { token: 'comment.python', foreground: '#5c6370', fontStyle: 'italic' }, // Python注释
     { token: 'string.python', foreground: '#98c379' }, // Python字符串
+    { token: 'string.prefix.python', foreground: '#98c379' },
     { token: 'string.escape.python', foreground: '#56b6c2' }, // Python字符串转义
     { token: 'number.python', foreground: '#d19a66' }, // Python数字
     { token: 'number.hex.python', foreground: '#d19a66' }, // Python十六进制数字

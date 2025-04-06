@@ -271,11 +271,22 @@ function initPythonLanguage() {
         [/\b(?:len|range|int|str|float|list|dict|set|tuple|file)\b/, 'function.python'],
 
         // 字符串 - 三引号
-        [/("""|''')/, { token: 'string.python', next: '@multistring.$1' }],
+        [
+          /([uUbBrRfF]+)?("""|''')/,
+          {
+            token: 'string.python',
+            next: '@multistring.$2'
+          }
+        ],
 
-        // 字符串 - 单引号
-        [/"/, { token: 'string.python', next: '@string."' }],
-        [/'/, { token: 'string.python', next: "@string.'" }],
+        // 字符串 - 引号
+        [
+          /([uUbBrRfF]+)?(["'])/,
+          {
+            token: 'string.python',
+            next: '@string.$2'
+          }
+        ],
 
         // 数字
         [/\b\d+(\.\d+)?\b/, 'number.python'],
@@ -434,10 +445,23 @@ function initPythonLanguage() {
         // 内置函数
         [/\b(?:print|len|range|int|str|float|list|dict|set|tuple)\b/, 'function.python'],
 
-        // 字符串 - 单引号
-        [/"/, { token: 'string.python', next: '@string."' }],
-        [/'/, { token: 'string.python', next: "@string.'" }],
+        // 字符串 - 三引号
+        [
+          /([uUbBrRfF]+)?("""|''')/,
+          {
+            token: 'string.python',
+            next: '@multistring.$2'
+          }
+        ],
 
+        // 字符串 - 引号
+        [
+          /([uUbBrRfF]+)?(["'])/,
+          {
+            token: 'string.python',
+            next: '@string.$2'
+          }
+        ],
         // 数字
         [/\b\d+(\.\d+)?\b/, 'number.python'],
 
