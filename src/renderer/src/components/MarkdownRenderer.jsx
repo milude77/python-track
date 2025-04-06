@@ -1,9 +1,8 @@
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import ReactMarkdown from 'react-markdown'
 import Prism from 'prismjs'
 import remarkGfm from 'remark-gfm'
 import 'prismjs/plugins/autoloader/prism-autoloader'
-import 'prism-themes/themes/prism-one-light.css'
 import { theme } from 'antd'
 import { toast } from '../plugins/toast'
 
@@ -12,10 +11,46 @@ Prism.plugins.autoloader.languages_path =
   'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/'
 Prism.languages.vue = Prism.languages.html // 提前注册扩展语言
 const { useToken } = theme
+// 导入本地主题样式
+import darkTheme from 'prism-themes/themes/prism-one-dark.css?raw'
+import lightTheme from 'prism-themes/themes/prism-one-light.css?raw'
 
 // eslint-disable-next-line react/prop-types
 const MarkdownRenderer = ({ content }) => {
   const { token } = useToken()
+  const [isDarkMode, setIsDarkMode] = useState(
+    document.documentElement.getAttribute('data-theme') === 'dark'
+  )
+
+  useEffect(() => {
+    const observer = new MutationObserver((mutations) => {
+      mutations.forEach((mutation) => {
+        if (mutation.attributeName === 'data-theme') {
+          const newTheme = document.documentElement.getAttribute('data-theme')
+          setIsDarkMode(newTheme === 'dark')
+        }
+      })
+    })
+
+    observer.observe(document.documentElement, { attributes: true })
+
+    // 创建样式标签
+    const styleElement = document.createElement('style')
+    styleElement.id = 'prism-theme'
+    document.head.appendChild(styleElement)
+
+    // 更新主题样式
+    const updateTheme = () => {
+      styleElement.textContent = isDarkMode ? darkTheme : lightTheme
+    }
+
+    updateTheme()
+
+    return () => {
+      observer.disconnect()
+      styleElement.remove()
+    }
+  }, [isDarkMode])
   const containerRef = useRef(null)
 
   const baseStyle = {
@@ -168,10 +203,10 @@ const MarkdownRenderer = ({ content }) => {
 
       // 添加悬停效果
       tag.addEventListener('mouseover', () => {
-        tag.style.backgroundColor = '#f8f7f7' // hover 时的背景色
+        tag.style.backgroundColor = token['colorBgElevated'] // hover 时的背景色
       })
       tag.addEventListener('mouseout', () => {
-        tag.style.backgroundColor = '' // 恢复默认背景色
+        tag.style.backgroundColor = token['colorBgElevated'] // 恢复默认背景色
       })
 
       // 确保 pre 元素有定位上下文

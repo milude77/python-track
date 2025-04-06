@@ -261,14 +261,14 @@ function initPythonLanguage() {
 
         // 关键字
         [
-          /\b(?:if|while|for|return|import|from|as|class|try|except|finally|with|async|await)\b/,
+          /\b(?:print|if|while|for|return|import|from|as|class|try|except|finally|with|async|await)\b/,
           'keyword.python'
         ],
 
         // 特殊常量
         [/\b(?:None|True|False)\b/, 'constant.python'],
         // 内置函数
-        [/\b(?:print|len|range|int|str|float|list|dict|set|tuple)\b/, 'function.python'],
+        [/\b(?:len|range|int|str|float|list|dict|set|tuple|file)\b/, 'function.python'],
 
         // 字符串 - 三引号
         [/("""|''')/, { token: 'string.python', next: '@multistring.$1' }],

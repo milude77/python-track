@@ -52,9 +52,9 @@ const oneLight = {
     { token: 'delimiter.curly.python', foreground: '#abb2bf' }, // Python大括号
     { token: 'delimiter.bracket.python', foreground: '#abb2bf' }, // Python方括号
     { token: 'comment.python', foreground: '#5c6370', fontStyle: 'italic' }, // Python注释
-    { token: 'string.python', foreground: '#98c379' }, // Python字符串
+    { token: 'string.python', foreground: '#50a14f' }, // Python字符串
     { token: 'string.escape.python', foreground: '#56b6c2' }, // Python字符串转义
-    { token: 'function.python', foreground: '#997dec' },
+    { token: 'function.python', foreground: '#50a14f' },
     { token: 'number.python', foreground: '#d19a66' }, // Python数字
     { token: 'number.hex.python', foreground: '#d19a66' }, // Python十六进制数字
     { token: 'tag.python', foreground: '#e06c75' }, // Python装饰器
