@@ -117,14 +117,27 @@ const TutorialView = () => {
       // 设置代码块索引
       setCurrentCodeBlockIndex(validBlockIndex)
 
-      // 设置代码编辑器内容
-      setCode(
-        addHashToLines(tutorialData['sections'][validSectionIndex]['code_blocks'][validBlockIndex])
+      // 获取代码内容
+      const codeContent = addHashToLines(
+        tutorialData['sections'][validSectionIndex]['code_blocks'][validBlockIndex]
       )
+
+      // 设置代码编辑器内容
+      setCode(codeContent)
+
+      // 更新CodeBlockManager，分析代码中的类和函数
+      if (window.codeBlockManager) {
+        window.codeBlockManager.setCurrentBlock(codeContent)
+      }
     } else {
       // 如果没有代码块，重置代码块索引和代码内容
       setCurrentCodeBlockIndex(0)
       setCode('')
+
+      // 清空CodeBlockManager
+      if (window.codeBlockManager) {
+        window.codeBlockManager.setCurrentBlock('')
+      }
     }
   }
 
@@ -393,7 +406,14 @@ const TutorialView = () => {
                       language="python"
                       theme={theme}
                       value={code}
-                      onChange={setCode}
+                      onChange={(newCode) => {
+                        // 更新代码状态
+                        setCode(newCode)
+                        // 更新CodeBlockManager，分析代码中的类和函数
+                        if (window.codeBlockManager) {
+                          window.codeBlockManager.setCurrentBlock(newCode)
+                        }
+                      }}
                       loading={<Spin size="large" />}
                       options={{
                         minimap: { enabled: false },

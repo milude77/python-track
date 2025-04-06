@@ -7,6 +7,10 @@ function initPythonLanguage() {
   // eslint-disable-next-line no-undef
   monaco.languages.register({ id: 'python' })
 
+  // 注意：自动完成提供者已移至文件末尾，避免重复注册
+
+  // 注意：解析代码中的自定义函数和类的功能已移至CodeBlockManager类
+
   // 设置Python语言的语法高亮规则
   // eslint-disable-next-line no-undef
   monaco.languages.setMonarchTokensProvider('python', {
@@ -476,6 +480,68 @@ function initPythonLanguage() {
     provideCompletionItems: () => {
       const suggestions = []
 
+      if (window.codeBlockManager) {
+        const currentBlock = window.codeBlockManager.getCurrentBlock()
+        if (currentBlock) {
+          // 添加自定义类补全
+          const customClasses = currentBlock.getCustomClasses()
+          if (customClasses && customClasses.length > 0) {
+            customClasses.forEach((cls) => {
+              suggestions.push({
+                label: cls.name,
+                // eslint-disable-next-line no-undef
+                kind: monaco.languages.CompletionItemKind.Class,
+                insertText: cls.name,
+                detail: '自定义类',
+                documentation: cls.docstring || '用户定义的类'
+              })
+            })
+          }
+
+          // 添加自定义函数补全
+          const customFunctions = currentBlock.getCustomFunctions()
+          if (customFunctions && customFunctions.length > 0) {
+            customFunctions.forEach((func) => {
+              // 构建参数字符串
+              const paramsString = func.parameters
+                .map((p) => (p.hasDefaultValue ? `${p.name}=${p.defaultValue}` : p.name))
+                .join(', ')
+
+              // 只插入函数名和括号，将光标定位在括号内
+              suggestions.push({
+                label: `${func.name}(${paramsString})`,
+                // eslint-disable-next-line no-undef
+                kind: monaco.languages.CompletionItemKind.Function,
+                insertText: `${func.name}(\${1})`,
+                // eslint-disable-next-line no-undef
+                insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
+                detail: '自定义函数',
+                documentation: func.docstring || '用户定义的函数'
+              })
+            })
+          }
+        }
+      }
+      // 添加变量建议
+      if (window.codeBlockManager) {
+        const currentBlock = window.codeBlockManager.getCurrentBlock()
+        if (currentBlock) {
+          const variables = currentBlock.getVariables()
+          if (variables && variables.length > 0) {
+            variables.forEach((variable) => {
+              suggestions.push({
+                label: variable.name,
+                // eslint-disable-next-line no-undef
+                kind: monaco.languages.CompletionItemKind.Variable,
+                insertText: variable.name,
+                detail: `变量 (${variable.type})`,
+                documentation: variable.value ? `值: ${variable.value}` : undefined
+              })
+            })
+          }
+        }
+      }
+
       // 添加关键字建议
       ;[
         'and',
@@ -615,9 +681,7 @@ function initPythonLanguage() {
         '.get(',
         '.update(',
         '.add(',
-        '.remove(',
         '.discard(',
-        '.pop(',
         '.clear(',
         '.strip(',
         '.lstrip(',

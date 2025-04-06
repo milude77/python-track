@@ -2,6 +2,7 @@
 import oneLightTheme from './monaco-one-light-theme'
 import oneDarkTheme from './monaco-one-dark-theme'
 import initPythonLanguage from './monaco-python-language'
+import { codeBlockManager } from './code-block-manager'
 
 const monaco = {
   init: () => {
@@ -12,6 +13,9 @@ const monaco = {
         paths: { vs: 'https://cdn.jsdelivr.net/npm/monaco-editor@0.52.2/min/vs' },
         'vs/nls': { availableLanguages: { '*': 'zh-cn' } }
       })
+
+      // 将codeBlockManager挂载到window对象上，使其全局可用
+      window.codeBlockManager = codeBlockManager
 
       // 加载Monaco编辑器
       window.require(['vs/editor/editor.main'], () => {
