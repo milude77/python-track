@@ -182,8 +182,10 @@ class CodeBlockManager {
    * @param {string} code - Python代码
    */
   analyzeVariables(code) {
-    // 匹配变量赋值语句，但排除类属性赋值（self.xxx）
+    // 匹配变量赋值语句
     const variableRegex = /^\s*([a-zA-Z_]\w*)\s*=\s*(.+)$/gm
+    // 匹配类属性赋值
+    const selfRegex = /^\s*self\.([a-zA-Z_]\w*)\s*=\s*(.+)$/gm
 
     // 匹配for循环变量
     const forLoopRegex = /for\s+([a-zA-Z_]\w*(?:\s*,\s*[a-zA-Z_]\w*)*)\s+in\s+.+:/gm
@@ -211,6 +213,23 @@ class CodeBlockManager {
       }
     }
 
+    while ((match = selfRegex.exec(code)) !== null) {
+      const variableName = match[1].trim()
+      const value = match[2].trim()
+
+      // 排除关键字、函数定义和类定义
+      if (!this.isKeywordOrDefinition(variableName, code, match.index)) {
+        // 检查变量是否是类的实例
+        const instanceOfClass = this.checkIfClassInstance(value)
+
+        this.variables.set(variableName, {
+          name: variableName,
+          value: value,
+          type: '实例变量',
+          instanceOf: instanceOfClass // 如果是类实例，记录类名
+        })
+      }
+    }
     // 处理for循环变量
     while ((match = forLoopRegex.exec(code)) !== null) {
       const variables = match[1].split(',').map((v) => v.trim())
