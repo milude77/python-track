@@ -267,7 +267,6 @@ function initPythonLanguage() {
 
         // 特殊常量
         [/\b(?:None|True|False)\b/, 'constant.python'],
-
         // 内置函数
         [/\b(?:print|len|range|int|str|float|list|dict|set|tuple)\b/, 'function.python'],
 
@@ -289,7 +288,7 @@ function initPythonLanguage() {
         [/[,.:;]/, 'delimiter.python'],
 
         // 操作符
-        [/[=+\-*/!<>]=?|\b(?:and|or|not|in|is)\b/, 'operator.python'],
+        [/[=+\-*/!%<>]=?|\b(?:and|or|not|in|is)\b/, 'operator.python'],
 
         // 类名识别 - 在class关键字后的标识符作为类名，设置为黄色高亮
         [/[A-Z][\w$]*/, 'type.identifier'],

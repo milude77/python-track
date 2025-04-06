@@ -61,6 +61,7 @@ const oneLight = {
     { token: 'type.identifier', foreground: '#c18401' }, // Python类名 - 黄色高亮
     { token: 'method.name', foreground: '#4078f2' }, // Python方法名 - 蓝色高亮
     { token: 'keyword.def', foreground: '#a626a4' },
+    { token: 'operator.python', foreground: '#4078f2' }, // Python操作符 - 蓝色高亮
     { token: 'template.content', foreground: '#383a42' } // 模板字符串内容
   ],
   colors: {
