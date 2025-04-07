@@ -21,6 +21,7 @@ CORS(app)  # 允许跨域请求
 
 # 教程映射表
 TUTORIALS = {
+    "演练广场": "chapter00.md",
     "基础知识": "chapter01.md",
     "Python序列": "chapter02.md",
     "选择与循环": "chapter03.md",
@@ -45,7 +46,7 @@ def extract_sections(md_content):
     """从Markdown内容中提取章节"""
     sections = []
     current_section = {"title": "", "content": "", "code_blocks": []}
-    
+
     lines = md_content.split('\n')
     for line in lines:
         if line.startswith('## '):
@@ -56,14 +57,14 @@ def extract_sections(md_content):
             current_section["content"] += line + '\n'
         else:
             current_section["content"] += line + '\n'
-    
+
     if current_section["title"]:
         sections.append(current_section)
-    
+
     # 提取每个章节中的代码块
     for section in sections:
         section["code_blocks"] = extract_code_blocks(section["content"])
-    
+
     return sections
 
 
@@ -71,16 +72,16 @@ def run_code(code):
     """运行用户输入的代码并捕获输出和错误"""
     # 创建一个临时的命名空间，同时用于全局和本地
     namespace = {}
-    
+
     try:
         # 重定向标准输出以捕获print输出
         import io
         from contextlib import redirect_stdout
-        
+
         f = io.StringIO()
         with redirect_stdout(f):
             exec(code, namespace, namespace)
-        
+
         output = f.getvalue()
         return {"success": True, "output": output, "vars": namespace}
     except Exception as e:
@@ -106,21 +107,21 @@ def get_tutorial(tutorial_key):
     """获取特定教程的内容"""
     if tutorial_key not in TUTORIALS:
         return jsonify({"error": f"未找到教程 '{tutorial_key}'"}), 404
-    
+
     # 读取Markdown文件
     md_file = Path(__file__).parent / "notes" / TUTORIALS[tutorial_key]
     if not md_file.exists():
         return jsonify({"error": f"未找到Markdown文件 '{md_file}'"}), 404
-    
+
     with open(md_file, 'r', encoding='utf-8') as f:
         md_content = f.read()
-    
+
     # 提取章节
     sections = extract_sections(md_content)
-    
+
     # 获取教程标题
     title = md_content.split('\n')[0].lstrip('#').strip()
-    
+
     return jsonify({
         "title": title,
         "sections": sections
@@ -133,13 +134,13 @@ def execute_code():
     data = request.json
     user_code = data.get('code', '')
     expected_code = data.get('expected_code', '')
-    
+
     if not user_code:
         return jsonify({"error": "没有提供代码"}), 400
-    
+
     # 运行代码
     result = run_code(user_code)
-    
+
     # 如果有预期代码，使用AI评估
     ai_evaluation = None
     if expected_code and result["success"]:
@@ -149,7 +150,7 @@ def execute_code():
             ai_evaluation = {"passed": ai_result}
         except Exception as e:
             ai_evaluation = {"error": str(e)}
-    
+
     return jsonify({
         "success": result["success"],
         "output": result["output"],
@@ -165,10 +166,10 @@ def get_hint():
     user_code = data.get('code', '')
     expected_code = data.get('expected_code', '')
     actual_output = data.get('actual_output', '')
-    
+
     if not user_code or not expected_code:
         return jsonify({"error": "缺少必要参数"}), 400
-    
+
     try:
         ai_tutor = AITutor()
         hint = ai_tutor.generate_hint(
@@ -188,10 +189,10 @@ def get_solution():
     user_code = data.get('code', '')
     expected_code = data.get('expected_code', '')
     actual_output = data.get('actual_output', '')
-    
+
     if not expected_code:
         return jsonify({"error": "缺少必要参数"}), 400
-    
+
     try:
         ai_tutor = AITutor()
         solution = ai_tutor.generate_solution(

@@ -18,6 +18,7 @@ from pathlib import Path
 from ai_helper import AITutor
 # 教程映射表
 TUTORIALS = {
+    "演练广场": "chapter00.md",
     "基础知识": "chapter01.md",
     "Python序列": "chapter02.md",
     "选择与循环": "chapter03.md",
@@ -78,7 +79,7 @@ def extract_sections(md_content):
     """从Markdown内容中提取章节"""
     sections = []
     current_section = {"title": "", "content": "", "code_blocks": []}
-    
+
     lines = md_content.split('\n')
     for line in lines:
         if line.startswith('## '):
@@ -89,14 +90,14 @@ def extract_sections(md_content):
             current_section["content"] += line + '\n'
         else:
             current_section["content"] += line + '\n'
-    
+
     if current_section["title"]:
         sections.append(current_section)
-    
+
     # 提取每个章节中的代码块
     for section in sections:
         section["code_blocks"] = extract_code_blocks(section["content"])
-    
+
     return sections
 
 
@@ -104,16 +105,16 @@ def run_code(code):
     """运行用户输入的代码并捕获输出和错误"""
     # 创建一个临时的本地命名空间
     local_vars = {}
-    
+
     try:
         # 重定向标准输出以捕获print输出
         import io
         from contextlib import redirect_stdout
-        
+
         f = io.StringIO()
         with redirect_stdout(f):
             exec(code, globals(), local_vars)
-        
+
         output = f.getvalue()
         return True, output, local_vars
     except Exception as e:
@@ -125,24 +126,24 @@ def evaluate_code(expected_code, user_code, expected_output=None):
     """评估用户代码是否正确实现了预期功能"""
     # 运行用户代码
     success, user_output, user_vars = run_code(user_code)
-    
+
     if not success:
         print_colored("代码运行出错:", "RED")
         print(user_output)
         return False
-    
+
     # 如果有预期输出，检查输出是否匹配
     if expected_output and expected_output.strip() != user_output.strip():
         print_colored("输出与预期不符:", "YELLOW")
         print_colored(f"预期输出:\n{expected_output}", "GREEN")
         print_colored(f"实际输出:\n{user_output}", "RED")
         # 即使输出不匹配，也交给AI进行最终判断
-    
+
     # 使用AI评估代码
     try:
         ai_tutor = AITutor()
         ai_result = ai_tutor.evaluate_code(expected_code, user_code, user_output)
-        
+
         if ai_result:
             return True
         else:
@@ -150,14 +151,14 @@ def evaluate_code(expected_code, user_code, expected_output=None):
             return False
     except Exception as e:
         print_colored(f"AI评估失败，回退到传统评估方式: {str(e)}", "YELLOW")
-        
+
         # 回退到传统评估方式
         # 检查关键变量
         expected_success, _, expected_vars = run_code(expected_code)
         if not expected_success:
             # 如果示例代码有错误，我们只检查输出
             return True
-        
+
         # 检查关键变量是否存在并且值相同
         for var_name, var_value in expected_vars.items():
             if var_name not in user_vars:
@@ -168,7 +169,7 @@ def evaluate_code(expected_code, user_code, expected_output=None):
                 print_colored(f"预期值: {var_value}", "GREEN")
                 print_colored(f"实际值: {user_vars[var_name]}", "RED")
                 return False
-        
+
         return True
 
 
@@ -185,7 +186,7 @@ def practice_code_block(code_block, block_index, section_blocks=None, current_bl
         ai_tutor = None
     # 创建临时文件供用户编辑
     temp_file_path = Path(__file__).parent / "practice_temp.py"
-    
+
     # 写入初始注释和示例代码
     with open(temp_file_path, 'w', encoding='utf-8') as f:
         f.write(f"""# 代码练习 #{block_index}
@@ -203,14 +204,14 @@ def practice_code_block(code_block, block_index, section_blocks=None, current_bl
 # 在下方编写你的代码:
 
 """)
-    
+
     print_colored(f"\n已创建临时文件: {temp_file_path}", "BLUE")
     print_colored("请在该文件中编写你的代码，完成后保存文件，然后回到这里按Enter键执行", "BOLD")
-    
+
     while True:  # 主循环：处理用户输入和代码评估
         print_colored("(输入'skip'跳过, 'hint'获取提示, 'solution'查看解决方案, 'evaluate'重新评估, 'back'返回上一题, 'exit'或'quit'退出):", "BOLD")
         command = input().lower()
-        
+
         if command == 'skip':
             print_colored("已跳过此练习。\n", "YELLOW")
             with open(temp_file_path, 'w') as f:
@@ -226,10 +227,10 @@ def practice_code_block(code_block, block_index, section_blocks=None, current_bl
                 # 获取用户当前代码，指定编码为utf-8
                 with open(temp_file_path, 'r', encoding='utf-8') as f:
                     current_code = f.read()
-                
+
                 # 运行代码获取实际输出
                 _, actual_output, _ = run_code(current_code)
-                
+
                 # 生成智能提示
                 hint = ai_tutor.generate_hint(
                     user_code=current_code,
@@ -251,13 +252,13 @@ def practice_code_block(code_block, block_index, section_blocks=None, current_bl
                 return "back"
             else:
                 print_colored("没有上一个练习可以返回。\n", "YELLOW")
-                
+
         elif command == 'evaluate':
             if ai_tutor:
                 # 获取用户当前代码
                 with open(temp_file_path, 'r', encoding='utf-8') as f:
                     current_code = f.read()
-                
+
                 # 提取有效代码部分
                 lines = current_code.split('\n')
                 actual_code_lines = []
@@ -268,25 +269,25 @@ def practice_code_block(code_block, block_index, section_blocks=None, current_bl
                         continue
                     if in_code_section and not (line.startswith("# ") or line.startswith("'''")):
                         actual_code_lines.append(line)
-                
+
                 user_code = '\n'.join(actual_code_lines).strip()
-                
+
                 if not user_code:
                     print_colored("没有代码可以评估。\n", "YELLOW")
                     continue
-                
+
                 # 运行代码获取实际输出
                 success, output, _ = run_code(user_code)
-                
+
                 if not success:
                     print_colored("\n代码运行出错:", "RED")
                     print(output)
                     continue
-                
+
                 print_colored("\n代码运行成功!", "GREEN")
                 print_colored("输出:", "BLUE")
                 print(output)
-                
+
                 # 使用AI评估代码
                 if evaluate_code(code_block, user_code, output):
                     print_colored("\nAI评估: 代码功能实现正确\n", "GREEN")
@@ -294,15 +295,15 @@ def practice_code_block(code_block, block_index, section_blocks=None, current_bl
                     print_colored("\nAI评估: 代码需要调整，请修改后重新运行\n", "YELLOW")
             else:
                 print_colored("评估功能不可用", "YELLOW")
-                
+
         elif command == 'solution':
             if ai_tutor:
                 # 获取用户当前代码，指定编码为utf-8
                 with open(temp_file_path, 'r', encoding='utf-8') as f:
                     current_code = f.read()
-                
+
                 _, actual_output, _ = run_code(current_code)
-                
+
                 solution = ai_tutor.generate_solution(
                     user_code=current_code,
                     expected_output=code_block,
@@ -310,7 +311,7 @@ def practice_code_block(code_block, block_index, section_blocks=None, current_bl
                 )
                 print_colored("\nAI解决方案:", "GREEN")
                 print(solution)
-                
+
                 # 将解决方案写入临时文件，指定编码为utf-8
                 with open(temp_file_path, 'w', encoding='utf-8') as f:
                     f.write(f"# AI生成解决方案\n{solution}")
@@ -322,7 +323,7 @@ def practice_code_block(code_block, block_index, section_blocks=None, current_bl
                 try:
                     with open(temp_file_path, 'r', encoding='utf-8') as f:
                         user_code = f.read()
-                    
+
                     # 提取有效代码部分
                     lines = user_code.split('\n')
                     actual_code_lines = []
@@ -333,23 +334,23 @@ def practice_code_block(code_block, block_index, section_blocks=None, current_bl
                             continue
                         if in_code_section and not (line.startswith("# ") or line.startswith("'''")):
                             actual_code_lines.append(line)
-                    
+
                     user_code = '\n'.join(actual_code_lines).strip()
-                    
+
                     if not user_code:
                         print_colored("没有输入代码，已跳过。\n", "YELLOW")
                         with open(temp_file_path, 'w') as f:
                             f.write("")
                         return
-                    
+
                     # 运行并评估代码
                     success, output, _ = run_code(user_code)
-                    
+
                     if success:
                         print_colored("\n代码运行成功!", "GREEN")
                         print_colored("输出:", "BLUE")
                         print(output)
-                        
+
                         if evaluate_code(code_block, user_code):
                             print_colored("\n恭喜! 你的代码实现了预期功能。\n", "GREEN")
                             print_colored("AI评估: 代码功能实现正确", "GREEN")
@@ -364,7 +365,7 @@ def practice_code_block(code_block, block_index, section_blocks=None, current_bl
                         print(output)
                         print_colored("\n请修改后重新运行（按Enter）", "YELLOW")
                         break  # 返回主循环
-                
+
                 except Exception as e:
                     print_colored(f"文件读取错误: {e}", "RED")
                     break
@@ -375,23 +376,23 @@ def practice_code_block(code_block, block_index, section_blocks=None, current_bl
 def practice_section(section):
     """让用户练习一个章节的内容"""
     print_section(section["title"])
-    
+
     # 显示章节内容（不包括代码块）
     content_without_code = re.sub(r'```python\n.+?\n```', '', section["content"], flags=re.DOTALL)
     print(content_without_code)
-    
+
     # 如果有代码块，让用户练习
     if section["code_blocks"]:
         i = 0
         while i < len(section["code_blocks"]):
-            result = practice_code_block(section["code_blocks"][i], i+1, 
+            result = practice_code_block(section["code_blocks"][i], i+1,
                                         section["code_blocks"], i)
             # 如果返回值是"back"，则返回上一个代码块
             if result == "back":
                 i = max(0, i-1)  # 确保索引不会小于0
             else:
                 i += 1
-    
+
     input("按Enter键继续...")
 
 
@@ -401,23 +402,23 @@ def practice_tutorial(tutorial_key):
         print_colored(f"错误: 未找到教程 '{tutorial_key}'", "RED")
         print_usage()
         return
-    
+
     # 读取Markdown文件
     md_file = Path(__file__).parent / "notes" / TUTORIALS[tutorial_key]
     if not md_file.exists():
         print_colored(f"错误: 未找到Markdown文件 '{md_file}'", "RED")
         return
-    
+
     with open(md_file, 'r', encoding='utf-8') as f:
         md_content = f.read()
-    
+
     # 提取章节
     sections = extract_sections(md_content)
-    
+
     # 显示教程标题
     title = md_content.split('\n')[0].lstrip('#').strip()
     print_section(title)
-    
+
     # 介绍
     print("欢迎来到Python代码跟练系统!")
     print("本系统将引导你学习并实践Python编程。")
@@ -431,11 +432,11 @@ def practice_tutorial(tutorial_key):
     print("- 输入'done'完成代码输入并运行")
     print("\n让我们开始吧!")
     input("按Enter键继续...")
-    
+
     # 逐章节练习
     for section in sections:
         practice_section(section)
-    
+
     # 完成教程
     print_section(f"{title} - 完成!")
     print("恭喜你完成了本教程的学习和练习!")
@@ -447,7 +448,7 @@ def main():
     if len(sys.argv) < 2:
         print_usage()
         return
-    
+
     tutorial_key = sys.argv[1].lower()
     practice_tutorial(tutorial_key)
 

@@ -18,6 +18,7 @@ from ai_helper import AITutor
 
 # 教程映射表
 TUTORIALS = {
+    "演练广场": "chapter00.md",
     "基础知识": "chapter01.md",
     "Python序列": "chapter02.md",
     "选择与循环": "chapter03.md",
@@ -42,7 +43,7 @@ class IPCServer:
         self.extract_code_blocks = extract_code_blocks
         self.extract_sections = extract_sections
         self.run_code = run_code
-        
+
         # 注册信号处理器
         self._setup_signal_handlers()
 
@@ -53,7 +54,7 @@ class IPCServer:
             print(json.dumps({"status": "shutdown", "message": "Received SIGTERM, shutting down"}), flush=True)
             self.running = False
             sys.exit(0)
-            
+
         # 处理SIGINT信号（键盘中断，如Ctrl+C）
         def handle_sigint(signum, frame):
             print(json.dumps({"status": "shutdown", "message": "Received SIGINT, shutting down"}), flush=True)
@@ -248,26 +249,26 @@ class IPCServer:
         }
         if request_id:
             response["requestId"] = request_id
-        
+
         # 将响应转换为JSON字符串
         json_str = json.dumps(response)
-        
+
         # 如果响应小于8KB，直接发送
         if len(json_str) < 8000:
             print(json_str, flush=True)
             return
-            
+
         # 否则分块发送
         chunk_size = 8000  # 每块大小约8KB，减小块大小以避免解析问题
         total_chunks = (len(json_str) + chunk_size - 1) // chunk_size
-        
+
         # 发送开始标记
         print(json.dumps({
             "status": "stream_start",
             "total_chunks": total_chunks,
             "requestId": request_id
         }), flush=True)
-        
+
         # 分块发送数据
         for i in range(total_chunks):
             chunk = json_str[i * chunk_size:(i + 1) * chunk_size]
@@ -280,7 +281,7 @@ class IPCServer:
             # 添加小延迟，避免数据发送过快导致接收端缓冲区溢出
             import time
             time.sleep(0.01)
-        
+
         # 发送结束标记
         print(json.dumps({
             "status": "stream_end",
@@ -295,26 +296,26 @@ class IPCServer:
         }
         if request_id:
             error["requestId"] = request_id
-            
+
         # 将错误转换为JSON字符串
         json_str = json.dumps(error)
-        
+
         # 如果错误消息小于8KB，直接发送
         if len(json_str) < 8000:
             print(json_str, flush=True)
             return
-            
+
         # 否则分块发送
         chunk_size = 8000  # 每块大小约8KB，减小块大小以避免解析问题
         total_chunks = (len(json_str) + chunk_size - 1) // chunk_size
-        
+
         # 发送开始标记
         print(json.dumps({
             "status": "stream_start",
             "total_chunks": total_chunks,
             "requestId": request_id
         }), flush=True)
-        
+
         # 分块发送数据
         for i in range(total_chunks):
             chunk = json_str[i * chunk_size:(i + 1) * chunk_size]
@@ -327,7 +328,7 @@ class IPCServer:
             # 添加小延迟，避免数据发送过快导致接收端缓冲区溢出
             import time
             time.sleep(0.01)
-        
+
         # 发送结束标记
         print(json.dumps({
             "status": "stream_end",

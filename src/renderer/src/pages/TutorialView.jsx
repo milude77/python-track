@@ -24,10 +24,11 @@ function removeCommentsAndPrompt(code) {
     .join('\n')
 }
 
-function addHashToLines(text) {
+function addHashToLines(text, isDemo = false) {
   // 使用 split('\n') 将文本按行分割成数组
   // 然后使用 map 为每一行开头添加 #
   // 最后用 join('\n') 将数组重新组合成多行文本
+  if (isDemo) return ''
   return (
     text
       .split('\n')
@@ -101,7 +102,9 @@ const TutorialView = () => {
 
     // 设置章节索引
     setCurrentSectionIndex(validSectionIndex)
-
+    if (tutorialData.title === '代码演练') {
+      tutorialData['sections'][validSectionIndex]['code_blocks'] = ['']
+    }
     // 检查该章节是否有代码块
     if (
       tutorialData['sections'][validSectionIndex] &&
@@ -119,7 +122,8 @@ const TutorialView = () => {
 
       // 获取代码内容
       const codeContent = addHashToLines(
-        tutorialData['sections'][validSectionIndex]['code_blocks'][validBlockIndex]
+        tutorialData['sections'][validSectionIndex]['code_blocks'][validBlockIndex],
+        tutorialData.title === '代码演练'
       )
 
       // 设置代码编辑器内容
@@ -347,26 +351,28 @@ const TutorialView = () => {
     }
 
     return (
-      <div className="code-block-selector">
-        <Title level={4}>代码练习</Title>
-        <Space wrap>
-          {section['code_blocks'].map((_, index) => {
-            const exerciseKey = `${tutorialKey}-${currentSectionIndex}-${index}`
-            const isCompleted = completedExercises.includes(exerciseKey)
+      tutorial['title'] !== '代码演练' && (
+        <div className="code-block-selector">
+          <Title level={4}>代码练习</Title>
+          <Space wrap>
+            {section['code_blocks'].map((_, index) => {
+              const exerciseKey = `${tutorialKey}-${currentSectionIndex}-${index}`
+              const isCompleted = completedExercises.includes(exerciseKey)
 
-            return (
-              <Button
-                key={index}
-                type={currentCodeBlockIndex === index ? 'primary' : 'default'}
-                onClick={() => handleCodeBlockChange(index)}
-                icon={isCompleted ? <TrophyOutlined /> : null}
-              >
-                练习 {index + 1}
-              </Button>
-            )
-          })}
-        </Space>
-      </div>
+              return (
+                <Button
+                  key={index}
+                  type={currentCodeBlockIndex === index ? 'primary' : 'default'}
+                  onClick={() => handleCodeBlockChange(index)}
+                  icon={isCompleted ? <TrophyOutlined /> : null}
+                >
+                  练习 {index + 1}
+                </Button>
+              )
+            })}
+          </Space>
+        </div>
+      )
     )
   }
 
@@ -385,130 +391,191 @@ const TutorialView = () => {
 
   return (
     <div className="tutorial-view">
-      <Title level={2}>{tutorial.title}</Title>
+      {tutorial['title'] !== '代码演练' && <Title level={2}>{tutorial.title}</Title>}
 
-      <Tabs
-        activeKey={String(currentSectionIndex)}
-        onChange={handleSectionChange}
-        items={tutorial['sections'].map((section, index) => ({
-          key: String(index),
-          label: section.title,
-          children: (
-            <div className="section-content">
-              {renderSectionContent(section)}
-              {renderCodeBlockSelector(section)}
-
-              {section['code_blocks'] && section['code_blocks'].length > 0 && (
-                <div className="code-practice-area">
-                  <div className="code-editor-container">
-                    <Editor
-                      height="400px"
-                      language="python"
-                      theme={theme}
-                      value={code}
-                      onChange={(newCode) => {
-                        // 更新代码状态
-                        setCode(newCode)
-                        // 更新CodeBlockManager，分析代码中的类和函数
-                        if (window.codeBlockManager) {
-                          window.codeBlockManager.setCurrentBlock(newCode)
-                        }
-                      }}
-                      loading={<Spin size="large" />}
-                      options={{
-                        minimap: { enabled: false },
-                        fontSize: 14,
-                        scrollBeyondLastLine: false,
-                        automaticLayout: true
-                      }}
-                    />
-                  </div>
-
-                  <div className="code-actions">
-                    <Button
-                      type="primary"
-                      icon={<PlayCircleOutlined />}
-                      onClick={runCode}
-                      loading={outputStatus === 'running'}
-                    >
-                      运行代码
-                    </Button>
-                    <Button icon={<BulbOutlined />} onClick={getHint} loading={hintLoading}>
-                      获取提示
-                    </Button>
-                    <Button
-                      icon={<SolutionOutlined />}
-                      onClick={getSolution}
-                      loading={solutionLoading}
-                    >
-                      查看解决方案
-                    </Button>
-                  </div>
-
-                  {output && (
-                    <div className={`code-output ${outputStatus}`}>
-                      <Text className="output-tag">输出结果</Text>
-                      <pre>{output.trim()}</pre>
-                    </div>
-                  )}
-
-                  {evaluation && (
-                    <div className="evaluation-result">
-                      {evaluation.passed ? (
-                        <Alert
-                          message="代码评估通过"
-                          description="恭喜！你的代码实现了预期功能。"
-                          type="success"
-                          showIcon
-                        />
-                      ) : (
-                        <Alert
-                          message="代码评估未通过"
-                          description="你的代码还需要调整，请参考提示进行修改。"
-                          type="warning"
-                          showIcon
-                        />
-                      )}
-                    </div>
-                  )}
+      {tutorial['title'] === '代码演练' ? (
+        // 直接渲染第一个section的内容
+        <div className="section-content">
+          {renderSectionContent(tutorial['sections'][0])}
+          <Divider orientation="left" orientationMargin="0">
+            <Typography.Text strong style={{ fontSize: '16px' }}>
+              🚀 编写代码 &gt;&gt;&gt;
+            </Typography.Text>
+          </Divider>
+          {tutorial['sections'][0]['code_blocks'] &&
+            tutorial['sections'][0]['code_blocks'].length > 0 && (
+              <div className="code-practice-area">
+                <div className="code-editor-container">
+                  <Editor
+                    height="400px"
+                    language="python"
+                    theme={theme}
+                    value={code}
+                    onChange={(newCode) => {
+                      setCode(newCode)
+                      if (window.codeBlockManager) {
+                        window.codeBlockManager.setCurrentBlock(newCode)
+                      }
+                    }}
+                    loading={<Spin size="large" />}
+                    options={{
+                      minimap: { enabled: false },
+                      fontSize: 14,
+                      scrollBeyondLastLine: false,
+                      automaticLayout: true
+                    }}
+                  />
                 </div>
-              )}
-            </div>
-          )
-        }))}
-      />
 
-      <Divider />
+                <div className="code-actions">
+                  <Button
+                    type="primary"
+                    icon={<PlayCircleOutlined />}
+                    onClick={runCode}
+                    loading={outputStatus === 'running'}
+                  >
+                    运行代码
+                  </Button>
+                </div>
 
-      <div className="achievements-section">
-        <Title level={4}>学习进度</Title>
-        <Card>
-          <div className="progress-stats">
-            {completedExercises.filter((exercise) => exercise.startsWith(`${tutorialKey}-`))
-              .length > 0 && (
-              <div className="stat-item">
-                <Badge
-                  count={
-                    completedExercises.filter((exercise) => exercise.startsWith(`${tutorialKey}-`))
-                      .length
-                  }
-                  overflowCount={999}
-                />
-                <Text>已完成练习</Text>
+                {output && (
+                  <div className={`code-output ${outputStatus}`}>
+                    <Text className="output-tag">输出结果</Text>
+                    <pre>{output.trim()}</pre>
+                  </div>
+                )}
               </div>
             )}
-            <div className="stat-item">
-              <Badge
-                count={tutorial['sections'].reduce((total, section) => {
-                  return total + (section['code_blocks'] ? section['code_blocks'].length : 0)
-                }, 0)}
-                style={{ backgroundColor: '#52c41a' }}
-              />
-              <Text>总练习数</Text>
+        </div>
+      ) : (
+        <Tabs
+          activeKey={String(currentSectionIndex)}
+          onChange={handleSectionChange}
+          items={tutorial['sections'].map((section, index) => ({
+            key: String(index),
+            label: section.title,
+            children: (
+              <div className="section-content">
+                {renderSectionContent(section)}
+                {renderCodeBlockSelector(section)}
+
+                {section['code_blocks'] && section['code_blocks'].length > 0 && (
+                  <div className="code-practice-area">
+                    <div className="code-editor-container">
+                      <Editor
+                        height="400px"
+                        language="python"
+                        theme={theme}
+                        value={code}
+                        onChange={(newCode) => {
+                          // 更新代码状态
+                          setCode(newCode)
+                          // 更新CodeBlockManager，分析代码中的类和函数
+                          if (window.codeBlockManager) {
+                            window.codeBlockManager.setCurrentBlock(newCode)
+                          }
+                        }}
+                        loading={<Spin size="large" />}
+                        options={{
+                          minimap: { enabled: false },
+                          fontSize: 14,
+                          scrollBeyondLastLine: false,
+                          automaticLayout: true
+                        }}
+                      />
+                    </div>
+
+                    <div className="code-actions">
+                      <Button
+                        type="primary"
+                        icon={<PlayCircleOutlined />}
+                        onClick={runCode}
+                        loading={outputStatus === 'running'}
+                      >
+                        运行代码
+                      </Button>
+
+                      <Button icon={<BulbOutlined />} onClick={getHint} loading={hintLoading}>
+                        获取提示
+                      </Button>
+
+                      <Button
+                        icon={<SolutionOutlined />}
+                        onClick={getSolution}
+                        loading={solutionLoading}
+                      >
+                        查看解决方案
+                      </Button>
+                    </div>
+
+                    {output && (
+                      <div className={`code-output ${outputStatus}`}>
+                        <Text className="output-tag">输出结果</Text>
+                        <pre>{output.trim()}</pre>
+                      </div>
+                    )}
+
+                    {evaluation && (
+                      <div className="evaluation-result">
+                        {evaluation.passed ? (
+                          <Alert
+                            message="代码评估通过"
+                            description="恭喜！你的代码实现了预期功能。"
+                            type="success"
+                            showIcon
+                          />
+                        ) : (
+                          <Alert
+                            message="代码评估未通过"
+                            description="你的代码还需要调整，请参考提示进行修改。"
+                            type="warning"
+                            showIcon
+                          />
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+            )
+          }))}
+        />
+      )}
+
+      {tutorial['title'] !== '代码演练' && <Divider />}
+
+      {tutorial['title'] !== '代码演练' && (
+        <div className="achievements-section">
+          <Title level={4}>学习进度</Title>
+          <Card>
+            <div className="progress-stats">
+              {completedExercises.filter((exercise) => exercise.startsWith(`${tutorialKey}-`))
+                .length > 0 && (
+                <div className="stat-item">
+                  <Badge
+                    count={
+                      completedExercises.filter((exercise) =>
+                        exercise.startsWith(`${tutorialKey}-`)
+                      ).length
+                    }
+                    overflowCount={999}
+                  />
+                  <Text>已完成练习</Text>
+                </div>
+              )}
+              <div className="stat-item">
+                <Badge
+                  count={tutorial['sections'].reduce((total, section) => {
+                    return total + (section['code_blocks'] ? section['code_blocks'].length : 0)
+                  }, 0)}
+                  style={{ backgroundColor: '#52c41a' }}
+                />
+                <Text>总练习数</Text>
+              </div>
             </div>
-          </div>
-        </Card>
-      </div>
+          </Card>
+        </div>
+      )}
     </div>
   )
 }
