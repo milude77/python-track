@@ -53,7 +53,7 @@ const oneDark = {
     { token: 'type.identifier', foreground: '#c18401' }, // Python类名 - 黄色高亮
     { token: 'method.name', foreground: '#61afef' }, // Python方法名 - 蓝色高亮
     { token: 'keyword.def', foreground: '#c678dd' }, // def 关键字
-    { token: 'template.content', foreground: '#383a42' } // 模板字符串内容
+    { token: 'template.content', foreground: '#abb2bf' } // 模板字符串内容
   ],
   colors: {
     // 编辑器基础颜色
