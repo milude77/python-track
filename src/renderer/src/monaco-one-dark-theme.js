@@ -50,7 +50,7 @@ const oneDark = {
     { token: 'function.python', foreground: '#98c379' }, // Python内置函数
     { token: 'constant.python', foreground: '#d19a66' }, // Python常量
     { token: 'operator.python', foreground: '#61afef' }, // Python操作符
-    { token: 'type.identifier', foreground: '#c18401' }, // Python类名 - 黄色高亮
+    { token: 'type.identifier', foreground: '#d19a66' }, // Python类名 - 黄色高亮
     { token: 'method.name', foreground: '#61afef' }, // Python方法名 - 蓝色高亮
     { token: 'keyword.def', foreground: '#c678dd' }, // def 关键字
     { token: 'template.content', foreground: '#abb2bf' } // 模板字符串内容
