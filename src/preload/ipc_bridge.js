@@ -88,6 +88,21 @@ const ipcApi = {
   // 设置主题
   setTheme: async (theme) => {
     return ipcRenderer.invoke('set-theme', theme)
+  },
+
+  // 获取代码编辑内容
+  getCodeEditorContent: async (tutorialKey, sectionIndex, blockIndex) => {
+    return ipcRenderer.invoke('get-code-editor-content', { tutorialKey, sectionIndex, blockIndex })
+  },
+
+  // 设置代码编辑内容
+  setCodeEditorContent: async (tutorialKey, sectionIndex, blockIndex, content) => {
+    return ipcRenderer.invoke('set-code-editor-content', {
+      tutorialKey,
+      sectionIndex,
+      blockIndex,
+      content
+    })
   }
 }
 

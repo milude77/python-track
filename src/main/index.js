@@ -455,6 +455,19 @@ app.whenReady().then(() => {
     return true
   })
 
+  // 处理代码编辑内容的持久化
+  ipcMain.handle('get-code-editor-content', (event, { tutorialKey, sectionIndex, blockIndex }) => {
+    return stateStore.getCodeEditorContent(tutorialKey, sectionIndex, blockIndex)
+  })
+
+  ipcMain.handle(
+    'set-code-editor-content',
+    (event, { tutorialKey, sectionIndex, blockIndex, content }) => {
+      stateStore.setCodeEditorContent(tutorialKey, sectionIndex, blockIndex, content)
+      return true
+    }
+  )
+
   createWindow()
 
   app.on('activate', function () {

@@ -15,7 +15,9 @@ const store = new Store({
     // 已完成的练习
     completedExercises: [],
     // 主题设置
-    theme: 'light'
+    theme: 'light',
+    // 演练场代码编辑内容
+    codeEditorContents: {}
   }
 })
 
@@ -117,6 +119,33 @@ function setTheme(theme) {
   store.set('theme', theme)
 }
 
+/**
+ * 获取代码编辑内容
+ * @param {string} tutorialKey 教程的key
+ * @param {number} sectionIndex 章节索引
+ * @param {number} blockIndex 代码块索引
+ * @returns {string} 保存的代码内容
+ */
+function getCodeEditorContent(tutorialKey, sectionIndex, blockIndex) {
+  const codeEditorContents = store.get('codeEditorContents')
+  const key = `${tutorialKey}-${sectionIndex}-${blockIndex}`
+  return codeEditorContents[key] || ''
+}
+
+/**
+ * 设置代码编辑内容
+ * @param {string} tutorialKey 教程的key
+ * @param {number} sectionIndex 章节索引
+ * @param {number} blockIndex 代码块索引
+ * @param {string} content 代码内容
+ */
+function setCodeEditorContent(tutorialKey, sectionIndex, blockIndex, content) {
+  const codeEditorContents = store.get('codeEditorContents')
+  const key = `${tutorialKey}-${sectionIndex}-${blockIndex}`
+  codeEditorContents[key] = content
+  store.set('codeEditorContents', codeEditorContents)
+}
+
 export default {
   getCurrentTutorial,
   setCurrentTutorial,
@@ -125,5 +154,7 @@ export default {
   getCompletedExercises,
   addCompletedExercise,
   getTheme,
-  setTheme
+  setTheme,
+  getCodeEditorContent,
+  setCodeEditorContent
 }

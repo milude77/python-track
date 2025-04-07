@@ -96,7 +96,7 @@ const TutorialView = () => {
   }, [])
 
   // 初始化代码编辑器内容的辅助函数
-  const initializeCodeEditor = (tutorialData, sectionIndex, blockIndex) => {
+  const initializeCodeEditor = async (tutorialData, sectionIndex, blockIndex) => {
     // 确保索引在有效范围内
     const validSectionIndex = Math.min(sectionIndex, tutorialData['sections'].length - 1)
 
@@ -120,11 +120,41 @@ const TutorialView = () => {
       // 设置代码块索引
       setCurrentCodeBlockIndex(validBlockIndex)
 
-      // 获取代码内容
-      const codeContent = addHashToLines(
-        tutorialData['sections'][validSectionIndex]['code_blocks'][validBlockIndex],
-        tutorialData.title === '代码演练'
-      )
+      // 尝试从持久化存储中获取保存的代码内容
+      let codeContent = ''
+      if (window.ipcApi && window.ipcApi.getCodeEditorContent) {
+        try {
+          const savedCode = await window.ipcApi.getCodeEditorContent(
+            tutorialData.title,
+            validSectionIndex,
+            validBlockIndex
+          )
+
+          // 如果有保存的代码，使用保存的代码
+          if (savedCode) {
+            codeContent = savedCode
+          } else {
+            // 否则使用默认代码
+            codeContent = addHashToLines(
+              tutorialData['sections'][validSectionIndex]['code_blocks'][validBlockIndex],
+              tutorialData.title === '代码演练'
+            )
+          }
+        } catch (error) {
+          console.error('获取保存的代码内容失败:', error)
+          // 出错时使用默认代码
+          codeContent = addHashToLines(
+            tutorialData['sections'][validSectionIndex]['code_blocks'][validBlockIndex],
+            tutorialData.title === '代码演练'
+          )
+        }
+      } else {
+        // 如果API不可用，使用默认代码
+        codeContent = addHashToLines(
+          tutorialData['sections'][validSectionIndex]['code_blocks'][validBlockIndex],
+          tutorialData.title === '代码演练'
+        )
+      }
 
       // 设置代码编辑器内容
       setCode(codeContent)
@@ -416,6 +446,20 @@ const TutorialView = () => {
                       if (window.codeBlockManager) {
                         window.codeBlockManager.setCurrentBlock(newCode)
                       }
+
+                      // 保存代码内容到持久化存储
+                      if (window.ipcApi && window.ipcApi.setCodeEditorContent && tutorialKey) {
+                        window.ipcApi
+                          .setCodeEditorContent(
+                            tutorial.title,
+                            0, // 代码演练模式下只有一个section
+                            0, // 代码演练模式下只有一个代码块
+                            newCode
+                          )
+                          .catch((error) => {
+                            console.error('保存代码内容失败:', error)
+                          })
+                      }
                     }}
                     loading={<Spin size="large" />}
                     options={{
@@ -473,6 +517,20 @@ const TutorialView = () => {
                           // 更新CodeBlockManager，分析代码中的类和函数
                           if (window.codeBlockManager) {
                             window.codeBlockManager.setCurrentBlock(newCode)
+                          }
+
+                          // 保存代码内容到持久化存储
+                          if (window.ipcApi && window.ipcApi.setCodeEditorContent && tutorialKey) {
+                            window.ipcApi
+                              .setCodeEditorContent(
+                                tutorialKey,
+                                currentSectionIndex,
+                                currentCodeBlockIndex,
+                                newCode
+                              )
+                              .catch((error) => {
+                                console.error('保存代码内容失败:', error)
+                              })
                           }
                         }}
                         loading={<Spin size="large" />}
