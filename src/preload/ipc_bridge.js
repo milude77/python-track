@@ -103,6 +103,16 @@ const ipcApi = {
       blockIndex,
       content
     })
+  },
+
+  // 保存代码到本地文件
+  saveCodeToFile: async (code) => {
+    return ipcRenderer.invoke('save-code-to-file', code)
+  },
+
+  // 从本地文件导入代码
+  importCodeFromFile: async () => {
+    return ipcRenderer.invoke('import-code-from-file')
   }
 }
 

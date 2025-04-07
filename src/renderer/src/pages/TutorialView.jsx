@@ -6,7 +6,9 @@ import {
   PlayCircleOutlined,
   BulbOutlined,
   SolutionOutlined,
-  TrophyOutlined
+  TrophyOutlined,
+  SaveOutlined,
+  ImportOutlined
 } from '@ant-design/icons'
 import api from '../api/index'
 import './TutorialView.scss'
@@ -121,7 +123,7 @@ const TutorialView = () => {
       setCurrentCodeBlockIndex(validBlockIndex)
 
       // 尝试从持久化存储中获取保存的代码内容
-      let codeContent = ''
+      let codeContent
       if (window.ipcApi && window.ipcApi.getCodeEditorContent) {
         try {
           const savedCode = await window.ipcApi.getCodeEditorContent(
@@ -479,6 +481,78 @@ const TutorialView = () => {
                     loading={outputStatus === 'running'}
                   >
                     运行代码
+                  </Button>
+
+                  <Button
+                    icon={<ImportOutlined />}
+                    onClick={() => {
+                      if (window.ipcApi && window.ipcApi.importCodeFromFile) {
+                        window.ipcApi
+                          .importCodeFromFile()
+                          .then((result) => {
+                            if (result.success) {
+                              setCode(result.code)
+                              if (window.codeBlockManager) {
+                                window.codeBlockManager.setCurrentBlock(result.code)
+                              }
+                              message.success(`已导入文件: ${result.filePath}`)
+
+                              // 保存导入的代码到持久化存储
+                              if (
+                                window.ipcApi &&
+                                window.ipcApi.setCodeEditorContent &&
+                                tutorialKey
+                              ) {
+                                window.ipcApi
+                                  .setCodeEditorContent(
+                                    tutorial.title,
+                                    0, // 代码演练模式下只有一个section
+                                    0, // 代码演练模式下只有一个代码块
+                                    result.code
+                                  )
+                                  .catch((error) => {
+                                    console.error('保存导入的代码内容失败:', error)
+                                  })
+                              }
+                            } else {
+                              message.error(result.message || '导入失败')
+                            }
+                          })
+                          .catch((error) => {
+                            console.error('导入代码失败:', error)
+                            message.error('导入代码失败')
+                          })
+                      } else {
+                        message.error('导入功能不可用')
+                      }
+                    }}
+                  >
+                    导入
+                  </Button>
+
+                  <Button
+                    icon={<SaveOutlined />}
+                    onClick={() => {
+                      if (window.ipcApi && window.ipcApi.saveCodeToFile) {
+                        window.ipcApi
+                          .saveCodeToFile(code)
+                          .then((result) => {
+                            if (result.success) {
+                              message.success(`代码已保存到: ${result.filePath}`)
+                            } else {
+                              message.error(result.message || '保存失败')
+                            }
+                          })
+                          .catch((error) => {
+                            console.error('保存代码失败:', error)
+                            message.error('保存代码失败')
+                          })
+                      } else {
+                        message.error('保存功能不可用')
+                      }
+                    }}
+                  >
+                    另存为
                   </Button>
                 </div>
 

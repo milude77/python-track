@@ -1,4 +1,4 @@
-import { app, shell, BrowserWindow, ipcMain } from 'electron'
+import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import path, { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
 import icon from '../../resources/icon.png?asset'
@@ -370,6 +370,57 @@ app.whenReady().then(() => {
           window.close()
           break
       }
+    }
+  })
+  
+  // 保存Python代码到本地文件
+  ipcMain.handle('save-code-to-file', async (event, code) => {
+    try {
+      const win = BrowserWindow.getFocusedWindow()
+      if (!win) return { success: false, message: '无法获取当前窗口' }
+
+      const { canceled, filePath } = await dialog.showSaveDialog(win, {
+        title: '保存Python代码',
+        defaultPath: 'code.py',
+        filters: [{ name: 'Python文件', extensions: ['py'] }],
+        properties: ['createDirectory']
+      })
+
+      if (canceled || !filePath) {
+        return { success: false, message: '用户取消了保存操作' }
+      }
+
+      // 写入文件
+      fs.writeFileSync(filePath, code, 'utf8')
+      return { success: true, message: '文件保存成功', filePath }
+    } catch (error) {
+      console.error('保存文件失败:', error)
+      return { success: false, message: `保存文件失败: ${error.message}` }
+    }
+  })
+
+  // 从本地文件导入Python代码
+  ipcMain.handle('import-code-from-file', async (event) => {
+    try {
+      const win = BrowserWindow.getFocusedWindow()
+      if (!win) return { success: false, message: '无法获取当前窗口' }
+
+      const { canceled, filePaths } = await dialog.showOpenDialog(win, {
+        title: '导入Python代码',
+        filters: [{ name: 'Python文件', extensions: ['py'] }],
+        properties: ['openFile']
+      })
+
+      if (canceled || !filePaths || filePaths.length === 0) {
+        return { success: false, message: '用户取消了导入操作' }
+      }
+
+      // 读取文件
+      const code = fs.readFileSync(filePaths[0], 'utf8')
+      return { success: true, message: '文件导入成功', code, filePath: filePaths[0] }
+    } catch (error) {
+      console.error('导入文件失败:', error)
+      return { success: false, message: `导入文件失败: ${error.message}` }
     }
   })
 
