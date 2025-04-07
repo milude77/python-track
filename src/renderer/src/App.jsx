@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Layout, ConfigProvider, theme, Button } from 'antd'
+import { Layout, ConfigProvider, theme, Button, FloatButton } from 'antd'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { SunOutlined, MoonFilled } from '@ant-design/icons'
 import AppHeader from './components/AppHeader'
@@ -131,6 +131,12 @@ const App = () => {
                 <Route path="/tutorial/:tutorialKey" element={<TutorialView />} />
               </Routes>
             </div>
+            {/* 返回顶部悬浮按钮 */}
+            <FloatButton.BackTop
+              target={() => document.querySelector('.app-content')}
+              tooltip="返回顶部"
+              visibilityHeight={100}
+            />
           </Content>
         </Layout>
       </Layout>
