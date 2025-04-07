@@ -219,7 +219,9 @@ const MarkdownRenderer = ({ content }) => {
 
   // 高亮核心逻辑
   const highlightCode = () => {
-    Prism.highlightAllUnder(containerRef?.current)
+    if (containerRef?.current) {
+      Prism.highlightAllUnder(containerRef?.current)
+    }
     addLanguageLabels()
   }
 
@@ -272,8 +274,7 @@ const MarkdownRenderer = ({ content }) => {
           th: ({ children }) => <th style={tableHeaderStyle}>{children}</th>,
           code({ className, children, inline, ...props }) {
             const language = className?.replace('language-', '') || ''
-            console.log('current inline:' + inline)
-            return language ? (
+            return !inline && language ? (
               <pre
                 className={`language-${language}`}
                 style={{

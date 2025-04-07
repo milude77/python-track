@@ -199,7 +199,6 @@ const TutorialView = () => {
             try {
               const savedState = await window.ipcApi.getTutorialState(tutorialKey)
               if (savedState) {
-                console.log(JSON.stringify(savedState))
                 // 使用保存的状态初始化代码编辑器
                 initializeCodeEditor(
                   response.data,
