@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Layout, ConfigProvider, theme, Button } from 'antd'
 import { Routes, Route, Navigate } from 'react-router-dom'
-import { BulbOutlined, BulbFilled } from '@ant-design/icons'
+import { SunOutlined, MoonFilled } from '@ant-design/icons'
 import AppHeader from './components/AppHeader'
 import Sidebar from './components/Sidebar'
 import TutorialView from './pages/TutorialView'
@@ -119,9 +119,10 @@ const App = () => {
             <div className="theme-toggle">
               <Button
                 type="text"
-                icon={isDarkMode ? <BulbFilled /> : <BulbOutlined />}
+                icon={isDarkMode ? <MoonFilled /> : <SunOutlined />}
                 onClick={toggleTheme}
                 title={isDarkMode ? '切换到亮色模式' : '切换到暗色模式'}
+                className="theme-toggle-btn"
               />
             </div>
             <div className="content-container">

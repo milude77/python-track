@@ -28,6 +28,35 @@
     z-index: 10;
 }
 
+.theme-toggle-btn {
+    transition: transform 0.3s ease;
+    
+    .anticon {
+        font-size: 18px;
+    }
+    
+    .anticon-sun-filled {
+        color: #faad14;
+        animation: fadeIn 0.3s ease;
+    }
+    
+    .anticon-moon-filled {
+        color: #597ef7;
+        animation: fadeIn 0.3s ease;
+    }
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: scale(0.8) rotate(-30deg);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) rotate(0);
+    }
+}
+
 /* 代码编辑器样式 */
 .code-editor-container {
     margin-top: 16px;
