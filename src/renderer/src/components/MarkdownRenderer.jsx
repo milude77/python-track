@@ -1,10 +1,12 @@
-import { useEffect, useRef, useState } from 'react'
+import { memo, useEffect, useRef, useState } from 'react'
+import ReactDOM from 'react-dom/client'
 import ReactMarkdown from 'react-markdown'
 import Prism from 'prismjs'
 import remarkGfm from 'remark-gfm'
 import 'prismjs/plugins/autoloader/prism-autoloader'
 import { theme } from 'antd'
 import { toast } from '../plugins/toast'
+import MermaidRenderer from './MermaidRenderer'
 
 // 配置必须在模块作用域
 Prism.plugins.autoloader.languages_path =
@@ -15,8 +17,8 @@ const { useToken } = theme
 import darkTheme from 'prism-themes/themes/prism-one-dark.css?raw'
 import lightTheme from 'prism-themes/themes/prism-one-light.css?raw'
 
-// eslint-disable-next-line react/prop-types
-const MarkdownRenderer = ({ content }) => {
+// eslint-disable-next-line react/prop-types,react/display-name
+const MarkdownRenderer = memo(({ content }) => {
   const { token } = useToken()
   const [isDarkMode, setIsDarkMode] = useState(
     document.documentElement.getAttribute('data-theme') === 'dark'
@@ -217,8 +219,75 @@ const MarkdownRenderer = ({ content }) => {
     })
   }
 
+  // 存储React根节点的引用
+  const mermaidRootsRef = useRef(new Map())
+
+  const renderMermaidDiagrams = () => {
+    if (!containerRef?.current) return
+
+    const currentRoots = new Map(mermaidRootsRef.current)
+    const processedIds = new Set()
+
+    const mermaidBlocks = containerRef.current.querySelectorAll('pre > code.language-mermaid')
+
+    mermaidBlocks.forEach((codeBlock, index) => {
+      const pre = codeBlock.parentElement
+      if (!pre) return
+
+      // 获取或生成唯一ID
+      let mermaidId = pre.getAttribute('data-mermaid-id')
+      const code = codeBlock.textContent
+      if (!mermaidId) {
+        mermaidId = `mermaid-${index}`
+        pre.setAttribute('data-mermaid-id', mermaidId)
+      }
+      processedIds.add(mermaidId)
+
+      // 通过ID查找现有容器（不再依赖DOM位置）
+      let mermaidContainer = document.querySelector(`[data-mermaid-container-id="${index}"]`)
+
+      // 如果容器不存在再创建
+      if (!mermaidContainer) {
+        mermaidContainer = document.createElement('div')
+        mermaidContainer.className = 'mermaid-container'
+        mermaidContainer.setAttribute('data-mermaid-container-id', mermaidId)
+        if (!document.querySelector(`[data-mermaid-container-id="${mermaidId}"]`)) {
+          if (!document.querySelector(`[data-mermaid-container-id="${mermaidId}"]`)) {
+            pre.parentNode.insertBefore(mermaidContainer, pre.nextSibling)
+          }
+        }
+      }
+
+      pre.style.display = 'none'
+
+      // 获取或创建React根节点
+      let root = currentRoots.get(mermaidId)
+      if (!root) {
+        const existingRoot = mermaidContainer.querySelector('.mermaid-root')
+        if (existingRoot) {
+          // 复用现有DOM节点
+          root = ReactDOM.createRoot(existingRoot)
+        } else {
+          // 创建新的根节点
+          const mermaidRoot = document.createElement('div')
+          mermaidRoot.className = 'mermaid-root'
+          mermaidContainer.appendChild(mermaidRoot)
+          root = ReactDOM.createRoot(mermaidRoot)
+        }
+        currentRoots.set(mermaidId, root)
+      }
+
+      root.render(
+        <MermaidRenderer code={code} key={`${mermaidId}-${isDarkMode ? 'dark' : 'light'}`} />
+      )
+    })
+
+    mermaidRootsRef.current = currentRoots
+  }
+
   // 高亮核心逻辑
   const highlightCode = () => {
+    renderMermaidDiagrams()
     if (containerRef?.current) {
       Prism.highlightAllUnder(containerRef?.current)
     }
@@ -237,9 +306,18 @@ const MarkdownRenderer = ({ content }) => {
       })
   }
 
+  // 修改 useEffect 依赖项
   useEffect(() => {
-    const debounceTimer = setTimeout(highlightCode, 50) // 延迟确保 DOM 更新
-    return () => clearTimeout(debounceTimer)
+    const debouncedHighlight = setTimeout(() => {
+      highlightCode()
+    }, 50)
+    return () => clearTimeout(debouncedHighlight)
+  }) // 只在 content 变化时执行
+
+  // 优化主题切换处理
+  useEffect(() => {
+    const timer = setTimeout(renderMermaidDiagrams, 100)
+    return () => clearTimeout(timer)
   })
 
   return (
@@ -310,6 +388,6 @@ const MarkdownRenderer = ({ content }) => {
       </ReactMarkdown>
     </div>
   )
-}
+})
 
 export default MarkdownRenderer

@@ -66,7 +66,7 @@ const TutorialView = () => {
 
   // 加载已完成的练习列表
   useEffect(() => {
-    ; (async () => {
+    ;(async () => {
       try {
         if (window.ipcApi && window.ipcApi.getCompletedExercises) {
           const savedExercises = await window.ipcApi.getCompletedExercises()
@@ -689,18 +689,18 @@ const TutorialView = () => {
             <div className="progress-stats">
               {completedExercises.filter((exercise) => exercise.startsWith(`${tutorialKey}-`))
                 .length > 0 && (
-                  <div className="stat-item">
-                    <Badge
-                      count={
-                        completedExercises.filter((exercise) =>
-                          exercise.startsWith(`${tutorialKey}-`)
-                        ).length
-                      }
-                      overflowCount={999}
-                    />
-                    <Text>已完成练习</Text>
-                  </div>
-                )}
+                <div className="stat-item">
+                  <Badge
+                    count={
+                      completedExercises.filter((exercise) =>
+                        exercise.startsWith(`${tutorialKey}-`)
+                      ).length
+                    }
+                    overflowCount={999}
+                  />
+                  <Text>已完成练习</Text>
+                </div>
+              )}
               <div className="stat-item">
                 <Badge
                   count={tutorial['sections'].reduce((total, section) => {
