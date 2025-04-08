@@ -56,7 +56,7 @@ const App = () => {
 
   // 从electron-store加载保存的主题
   useEffect(() => {
-    const loadSavedTheme = async () => {
+    ;(async () => {
       if (window.ipcApi && window.ipcApi.getTheme) {
         try {
           const savedTheme = await window.ipcApi.getTheme()
@@ -69,9 +69,7 @@ const App = () => {
           console.error('加载保存的主题设置失败:', error)
         }
       }
-    }
-
-    loadSavedTheme()
+    })()
   }, [])
   useEffect(() => {
     const handleRouteChange = () => {
