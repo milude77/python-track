@@ -277,16 +277,6 @@ while True:
 
 ### 循环控制语句
 
-```mermaid
-flowchart TB
-    A[循环控制] --> B[break]
-    A --> C[continue]
-    A --> D[else子句]
-    B --> E[完全结束循环]
-    C --> F[跳过当前迭代]
-    D --> G[循环正常完成执行]
-```
-
 Python提供了三种主要的循环控制语句，用于更精细地控制循环行为：
 
 - **break语句**：立即终止整个循环，跳出循环体
