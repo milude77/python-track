@@ -1,372 +1,339 @@
 # 第6章 面向对象程序设计
 
-## 6.1 面向对象编程基础
+## 6.1 面向对象基础
 
-### 6.1.1 面向对象编程概述
+### 面向对象的基本概念
 
-面向对象编程（Object-Oriented Programming，OOP）是一种编程范式，它使用"对象"来设计应用程序和计算机程序。在Python中，一切皆为对象。面向对象编程的主要特点包括：
+Python作为一种多范式编程语言，对面向对象编程提供了全面的支持。以下是面向对象编程的核心概念：
 
-- **封装**：将数据和方法捆绑在一起，对外部隐藏实现细节
-- **继承**：允许一个类（子类）获取另一个类（父类）的属性和方法
-- **多态**：不同类可以定义相同的方法名，但具有不同的行为
+### 1. 类与对象
 
-### 6.1.2 类和对象
+- **类（Class）**：是对象的蓝图或原型，定义了对象将具有的属性和方法
+  - 属性：描述对象的特征或状态（数据）
+  - 方法：描述对象的行为或功能（函数）
+  - 构造方法：创建对象时自动调用的特殊方法（`__init__`）
+  - 特殊方法：提供特定功能的内置方法（如`__str__`、`__repr__`等）
 
-类是对象的蓝图或模板，定义了对象的属性和行为。对象是类的实例，代表类的具体实体。
+- **对象（Object）**：是类的实例，代表程序中的具体实体
+  - 状态：对象当前的属性值
+  - 行为：对象可以执行的操作
+  - 标识：对象的唯一标识符（内存地址）
 
+### 2. 面向对象的三大特性
+
+- **封装（Encapsulation）**：
+  - 将数据和方法捆绑在一起，形成一个独立的单元
+  - 通过访问控制限制对内部数据的直接访问
+  - 在Python中使用单下划线（`_`）和双下划线（`__`）前缀实现
+  - 提供公共接口（方法）来操作内部数据
+
+- **继承（Inheritance）**：
+  - 允许一个类（子类）获取另一个类（父类）的属性和方法
+  - 促进代码重用和建立类层次结构
+  - Python支持单继承和多继承
+  - 子类可以重写父类的方法，实现特定的行为
+
+- **多态（Polymorphism）**：
+  - 允许不同类的对象对同一消息做出响应
+  - 同一操作作用于不同的对象，可以有不同的解释和实现
+  - 在Python中通过方法重写和鸭子类型实现
+  - 增强代码的灵活性和可扩展性
+
+面向对象编程使代码更加模块化、可重用和易于维护，特别适合大型复杂系统的开发。
+Python的动态特性和灵活的语法使其成为学习和应用面向对象概念的理想语言。
+
+- **类**：是对象的蓝图或原型，定义了对象将具有的属性和方法
+- **对象**：是类的实例，代表程序中的具体实体
+- **属性**：描述对象的特征或状态
+- **方法**：描述对象的行为或功能
+
+### 类的定义与使用
 ```python
-# 定义一个简单的类
+# 基本类定义
 class Person:
-    # 类变量，被所有实例共享
-    species = "Homo sapiens"
-    
-    # 构造方法，初始化对象
+    """人类的基本定义"""
+
     def __init__(self, name, age):
-        # 实例变量，每个实例独有
-        self.name = name
+        """初始化方法"""
+        self.name = name  # 实例属性
         self.age = age
-    
-    # 实例方法
+
     def introduce(self):
-        return f"My name is {self.name} and I am {self.age} years old."
+        """自我介绍方法"""
+        return f"我叫{self.name}，今年{self.age}岁"
 
-# 创建类的实例（对象）
-person1 = Person("Alice", 25)
-person2 = Person("Bob", 30)
+# 创建对象
+person = Person("张三", 25)
+print(person.introduce())
 
-# 访问实例变量和方法
-print(person1.name)  # 输出: Alice
-print(person2.introduce())  # 输出: My name is Bob and I am 30 years old.
+# 类属性与实例属性
+class Student:
+    school = "Python大学"  # 类属性
 
-# 访问类变量
-print(person1.species)  # 输出: Homo sapiens
-print(Person.species)  # 输出: Homo sapiens
+    def __init__(self, name):
+        self.name = name  # 实例属性
+
+# 访问属性
+student = Student("李四")
+print(Student.school)  # 访问类属性
+print(student.name)    # 访问实例属性
 ```
 
-## 6.2 类的定义和使用
+## 6.2 类的特殊方法
 
-### 6.2.1 类的定义
+### 常用特殊方法
 
-在Python中，使用`class`关键字定义类：
+| 方法 | 说明 | 调用时机 |
+|------|------|----------|
+| __init__ | 构造方法 | 创建对象时 |
+| __str__ | 字符串表示 | str()函数 |
+| __repr__ | 详细字符串表示 | repr()函数 |
+| __len__ | 长度 | len()函数 |
+| __call__ | 可调用对象 | 对象() |
+| __getitem__ | 索引访问 | 对象[] |
+| __setitem__ | 索引赋值 | 对象[] = 值 |
 
 ```python
-class ClassName:
-    # 类体（属性和方法）
-    pass
+class Book:
+    def __init__(self, title, author, price):
+        self.title = title
+        self.author = author
+        self.price = price
+
+    def __str__(self):
+        return f"{self.title} by {self.author}"
+
+    def __repr__(self):
+        return f"Book(title='{self.title}', author='{self.author}', price={self.price})"
+
+    def __len__(self):
+        return len(self.title)
+
+    def __call__(self):
+        return f"这是一本{self.title}的书"
+
+# 使用特殊方法
+book = Book("Python编程", "张三", 59.9)
+print(str(book))      # 调用__str__
+print(repr(book))     # 调用__repr__
+print(len(book))      # 调用__len__
+print(book())         # 调用__call__
 ```
 
-### 6.2.2 构造方法
+## 6.3 继承与多态
 
-`__init__`方法是类的构造方法，在创建类的实例时自动调用：
+### 继承关系
 
-```python
-class Rectangle:
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
+继承是面向对象编程中的一个核心概念，它允许一个类（子类）获取另一个类（父类）的属性和方法。通过继承：
+
+- **代码重用**：子类可以重用父类中已定义的功能
+- **层次结构**：可以创建类的层次结构，反映实体之间的关系
+- **多态性**：子类可以重写父类的方法，提供特定的实现
+
+在上图中，Dog和Cat类都继承自Animal类，它们共享Animal的属性和方法，同时各自添加了特定的属性和行为。
+
+### 继承与多态示例
+```mermaid
+classDiagram
+    class Animal {
+        -name: str
+        +__init__(name: str)
+        +make_sound()* None
+    }
+
+    class Dog {
+        -breed: str
+        +__init__(name: str, breed: str)
+        +make_sound() str
+    }
+
+    class Cat {
+        -color: str
+        +__init__(name: str, color: str)
+        +make_sound() str
+    }
+
+    Animal <|-- Dog
+    Animal <|-- Cat
 ```
-
-### 6.2.3 实例方法
-
-实例方法是定义在类中的函数，第一个参数通常是`self`，代表实例本身：
-
-```python
-class Rectangle:
-    def __init__(self, width, height):
-        self.width = width
-        self.height = height
-    
-    def area(self):
-        return self.width * self.height
-    
-    def perimeter(self):
-        return 2 * (self.width + self.height)
-```
-
-### 6.2.4 类方法和静态方法
-
-- **类方法**：使用`@classmethod`装饰器，第一个参数是`cls`，代表类本身
-- **静态方法**：使用`@staticmethod`装饰器，不需要特定的第一个参数
-
-```python
-class MathUtils:
-    # 类变量
-    pi = 3.14159
-    
-    # 实例方法
-    def __init__(self, value):
-        self.value = value
-    
-    # 类方法
-    @classmethod
-    def circle_area(cls, radius):
-        return cls.pi * radius * radius
-    
-    # 静态方法
-    @staticmethod
-    def is_prime(n):
-        if n <= 1:
-            return False
-        for i in range(2, int(n**0.5) + 1):
-            if n % i == 0:
-                return False
-        return True
-```
-
-## 6.3 封装
-
-### 6.3.1 访问控制
-
-Python中通过命名约定实现访问控制：
-
-- 公有成员：普通命名，如`name`
-- 保护成员：单下划线前缀，如`_name`（约定，不强制）
-- 私有成员：双下划线前缀，如`__name`（会被转换为`_ClassName__name`）
-
-```python
-class Account:
-    def __init__(self, name, balance):
-        self.name = name  # 公有属性
-        self._type = "Savings"  # 保护属性
-        self.__balance = balance  # 私有属性
-    
-    def deposit(self, amount):
-        if amount > 0:
-            self.__balance += amount
-            return True
-        return False
-    
-    def withdraw(self, amount):
-        if 0 < amount <= self.__balance:
-            self.__balance -= amount
-            return True
-        return False
-    
-    def get_balance(self):
-        return self.__balance
-```
-
-### 6.3.2 属性装饰器
-
-Python提供`@property`装饰器，用于创建可控制访问的属性：
-
-```python
-class Person:
-    def __init__(self, name, age):
-        self._name = name
-        self._age = age
-    
-    @property
-    def name(self):
-        return self._name
-    
-    @name.setter
-    def name(self, value):
-        if not isinstance(value, str):
-            raise TypeError("Name must be a string")
-        self._name = value
-    
-    @property
-    def age(self):
-        return self._age
-    
-    @age.setter
-    def age(self, value):
-        if not isinstance(value, int):
-            raise TypeError("Age must be an integer")
-        if value < 0 or value > 150:
-            raise ValueError("Age must be between 0 and 150")
-        self._age = value
-```
-
-## 6.4 继承
-
-### 6.4.1 单继承
-
-```python
-class Person:
-    def __init__(self, name, age):
-        self.name = name
-        self.age = age
-    
-    def introduce(self):
-        return f"My name is {self.name} and I am {self.age} years old."
-
-class Student(Person):
-    def __init__(self, name, age, student_id):
-        # 调用父类的构造方法
-        super().__init__(name, age)
-        self.student_id = student_id
-    
-    def introduce(self):
-        # 重写父类方法
-        return f"{super().introduce()} My student ID is {self.student_id}."
-```
-
-### 6.4.2 多继承
-
-Python支持多继承，一个类可以继承多个父类：
-
-```python
-class A:
-    def method(self):
-        print("Method from A")
-
-class B:
-    def method(self):
-        print("Method from B")
-
-class C(A, B):
-    pass
-
-c = C()
-c.method()  # 输出: Method from A（按照MRO顺序）
-```
-
-### 6.4.3 方法解析顺序(MRO)
-
-Python使用C3线性化算法确定多继承时的方法解析顺序：
-
-```python
-class BaseClass(object):
-    def show(self):
-        print('BaseClass')
-
-class SubClassA(BaseClass):
-    def show(self):
-        print('Enter SubClassA')
-        super().show()
-        print('Exit SubClassA')
-
-class SubClassB(BaseClass):
-    def show(self):
-        print('Enter SubClassB')
-        super().show()
-        print('Exit SubClassB')
-
-class SubClassC(BaseClass):
-    def show(self):
-        print('Enter SubClassC')
-        super().show()
-        print('Exit SubClassC')
-
-class SubClassD(SubClassA, SubClassB, SubClassC):
-    def show(self):
-        print('Enter SubClassD')
-        super().show()
-        print('Exit SubClassD')
-
-d = SubClassD()
-d.show()
-print(SubClassD.mro())  # 查看MRO顺序
-```
-
-## 6.5 多态
-
-多态允许不同类的对象对同一消息做出响应，每个类可以以自己的方式实现方法：
 
 ```python
 class Animal:
-    def speak(self):
+    def __init__(self, name):
+        self.name = name
+
+    def make_sound(self):
         pass
 
 class Dog(Animal):
-    def speak(self):
-        return "Woof!"
+    def __init__(self, name, breed):
+        super().__init__(name)
+        self.breed = breed
+
+    def make_sound(self):
+        return "汪汪！"
 
 class Cat(Animal):
-    def speak(self):
-        return "Meow!"
+    def __init__(self, name, color):
+        super().__init__(name)
+        self.color = color
 
-class Duck(Animal):
-    def speak(self):
-        return "Quack!"
+    def make_sound(self):
+        return "喵喵！"
 
-# 多态函数
+# 多态示例
 def animal_sound(animal):
-    return animal.speak()
+    return animal.make_sound()
 
-# 不同对象，相同方法调用
-print(animal_sound(Dog()))  # 输出: Woof!
-print(animal_sound(Cat()))  # 输出: Meow!
-print(animal_sound(Duck()))  # 输出: Quack!
+dog = Dog("旺财", "金毛")
+cat = Cat("咪咪", "白色")
+
+print(animal_sound(dog))  # 汪汪！
+print(animal_sound(cat))  # 喵喵！
+
+# isinstance和issubclass
+print(isinstance(dog, Animal))  # True
+print(issubclass(Dog, Animal))  # True
 ```
 
-## 6.6 特殊方法
+## 6.4 封装与访问控制
 
-Python类可以实现特殊方法（魔术方法），以支持内置操作：
+### 封装的概念
 
-### 6.6.1 字符串表示
+封装是面向对象编程的三大特性之一（另外两个是继承和多态），它指的是将数据和操作数据的方法捆绑在一起，并对外部隐藏内部实现细节。
+
+### 访问控制
+
+Python中没有严格的私有属性，而是通过命名约定实现访问控制：
+
+公有属性：直接命名，如 name
+
+保护属性：单下划线开头，如 _age（约定私有，但可访问）
+
+私有属性：双下划线开头，如 __id（触发名称修饰，变为 _类名__id）
+
+#### 装饰器
+装饰器是修改其他函数/方法行为的函数，常见用途：
+
+@property：将方法转为属性访问
+
+@属性.setter：定义属性的赋值逻辑
+
+自定义装饰器：实现权限检查、日志记录等
+
+#### 完整示例代码
+```python
+class Person:
+    def __init__(self, name, age, id_num):
+        self.name = name          # 公有属性
+        self._age = age           # 保护属性（约定）
+        self.__id = id_num        # 私有属性（名称修饰）
+
+    # 自定义装饰器：记录属性访问
+    @staticmethod
+    def log_access(func):
+        def wrapper(*args, **kwargs):
+            print(f"[LOG] 访问属性: {func.__name__}")
+            return func(*args, **kwargs)
+        return wrapper
+
+    # 自定义装饰器：验证年龄范围
+    @staticmethod
+    def validate_age(func):
+        def wrapper(self, value):
+            if not (0 <= value <= 150):
+                raise ValueError("年龄必须在0-150之间")
+            return func(self, value)
+        return wrapper
+
+    # 保护属性的访问器与修改器
+    @property
+    @log_access
+    def age(self):
+        return self._age
+
+    @age.setter
+    @validate_age
+    def age(self, value):
+        self._age = value
+
+    # 私有属性的访问器与修改器（通过名称修饰访问）
+    @property
+    def id(self):
+        return self.__id
+
+    @id.setter
+    def id(self, value):
+        if not isinstance(value, int):
+            raise TypeError("ID必须是整数")
+        self.__id = value
+
+# 使用示例
+if __name__ == "__main__":
+    p = Person("Alice", 30, 1001)
+
+    # 访问公有属性
+    print(f"姓名: {p.name}")      # 直接访问
+
+    # 访问保护属性（通过装饰器）
+    print(f"年龄: {p.age}")       # 触发@log_access
+    p.age = 35                   # 触发@validate_age
+
+    # 访问私有属性（通过属性装饰器）
+    print(f"ID: {p.id}")
+    p.id = 1002                  # 触发类型检查
+
+    # 非法操作示例（会报错）
+    try:
+        p.age = 200              # 触发ValueError
+    except ValueError as e:
+        print(f"错误: {e}")
+
+    try:
+        p.id = "abc"             # 触发TypeError
+    except TypeError as e:
+        print(f"错误: {e}")
+
+    # 直接访问私有属性（不推荐！）
+    print(f"强制访问私有属性: {p._Person__id}")
+```
+## 6.6 类方法与静态方法
+
+### 方法类型对比
+
+| 方法类型 | 装饰器 | 第一个参数 | 使用场景 |
+|----------|--------|------------|----------|
+| 实例方法 | 无 | self | 操作实例属性 |
+| 类方法 | @classmethod | cls | 操作类属性 |
+| 静态方法 | @staticmethod | 无 | 工具方法 |
 
 ```python
-class Point:
-    def __init__(self, x, y):
-        self.x = x
-        self.y = y
-    
-    # 非正式字符串表示
+class Date:
+    def __init__(self, year, month, day):
+        self.year = year
+        self.month = month
+        self.day = day
+
+    @classmethod
+    def from_string(cls, date_string):
+        """从字符串创建日期对象"""
+        year, month, day = map(int, date_string.split('-'))
+        return cls(year, month, day)
+
+    @staticmethod
+    def is_valid_date(date_string):
+        """验证日期字符串格式"""
+        try:
+            year, month, day = map(int, date_string.split('-'))
+            return 1 <= month <= 12 and 1 <= day <= 31
+        except:
+            return False
+
     def __str__(self):
-        return f"({self.x}, {self.y})"
-    
-    # 正式字符串表示
-    def __repr__(self):
-        return f"Point({self.x}, {self.y})"
+        return f"{self.year}-{self.month:02d}-{self.day:02d}"
+
+# 使用示例
+date1 = Date(2023, 12, 31)
+date2 = Date.from_string("2023-12-31")  # 使用类方法
+print(Date.is_valid_date("2023-13-31"))  # 使用静态方法
 ```
-
-### 6.6.2 比较操作
-
-```python
-class Country:
-    def __init__(self, name, area):
-        self.__name = name
-        self.__area = area
-    
-    def getName(self):
-        return self.__name
-    
-    def getArea(self):
-        return self.__area
-    
-    # 小于比较
-    def __lt__(self, other):
-        return self.__area < other.__area
-    
-    # 等于比较
-    def __eq__(self, other):
-        return self.__area == other.__area
-    
-    def __str__(self):
-        return f"({self.__name}, {self.__area})"
-```
-
-### 6.6.3 容器操作
-
-```python
-class MyList:
-    def __init__(self, data=None):
-        self.data = data or []
-    
-    # 获取长度
-    def __len__(self):
-        return len(self.data)
-    
-    # 索引访问
-    def __getitem__(self, index):
-        return self.data[index]
-    
-    # 索引赋值
-    def __setitem__(self, index, value):
-        self.data[index] = value
-    
-    # 迭代支持
-    def __iter__(self):
-        return iter(self.data)
-```
-
-## 6.7 课后练习
-
-1. 创建一个`Rectangle`类，包含计算面积和周长的方法。
-2. 创建一个`BankAccount`类，实现存款和取款功能，确保账户余额不能为负。
-3. 创建一个`Vehicle`类，然后创建`Car`和`Motorcycle`子类，演示继承和多态。
-4. 实现一个`Stack`类，包含`push`、`pop`和`peek`方法。
-5. 创建一个`Shape`类和子类`Circle`、`Rectangle`、`Triangle`，每个子类都实现`area`方法。

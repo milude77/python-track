@@ -27,9 +27,7 @@ TUTORIALS = {
     "面向对象程序设计": "chapter06.md",
     "文件操作": "chapter07.md",
     "异常处理": "chapter08.md",
-    "模块和包": "chapter09.md",
-    "网络编程": "chapter10.md",
-    "多线程编程": "chapter11.md",
+    "GUI操作": "chapter09.md"
 }
 
 

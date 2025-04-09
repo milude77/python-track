@@ -1,421 +1,355 @@
 # 第7章 文件操作
 
-## 7.1 文件基础
+## 7.1 文件操作基础
 
-### 7.1.1 文件的概念
+文件操作是Python中常见的任务，理解文件操作的基本流程对于数据处理和存储至关重要：
 
-文件是存储在计算机存储介质上的一组相关数据的集合。在Python中，文件被视为一个对象，通过文件对象可以对文件进行读写操作。
+### 1. 打开文件
+- **open()函数**：Python使用内置的`open()`函数打开文件
+  ```python
+  file = open('example.txt', 'r', encoding='utf-8')
+  ```
+- **文件模式选择**：根据需要选择适当的模式（读、写、追加等）
+- **编码设置**：处理文本文件时，指定正确的字符编码（如UTF-8）
 
-### 7.1.2 文件路径
+### 2. 读/写操作
+- **读取操作**：
+  - `read()`：读取整个文件或指定字节数
+  - `readline()`：读取单行
+  - `readlines()`：读取所有行到列表
+  - 文件迭代器：直接遍历文件对象读取每行
 
-Python中的文件路径可以是相对路径或绝对路径：
+- **写入操作**：
+  - `write()`：写入字符串
+  - `writelines()`：写入字符串列表
 
-- **绝对路径**：从根目录开始的完整路径，如`C:\Users\username\Documents\file.txt`
-- **相对路径**：相对于当前工作目录的路径，如`data\file.txt`
+- **文件指针操作**：
+  - `seek()`：移动文件指针到指定位置
+  - `tell()`：获取当前文件指针位置
 
-在Windows系统中，路径分隔符为反斜杠`\`，但在Python字符串中需要使用双反斜杠`\\`或正斜杠`/`来表示。
+### 3. 关闭文件
+- **手动关闭**：使用`file.close()`方法
+- **自动关闭**：使用`with`语句（上下文管理器）
+  ```python
+  with open('example.txt', 'r') as file:
+      content = file.read()
+  # 文件在with块结束后自动关闭
+  ```
 
-```python
-# 使用双反斜杠
-path1 = "C:\\Users\\username\\Documents\\file.txt"
+### 4. 资源释放
+- 文件关闭后，系统会释放相关资源
+- 使用`with`语句可以确保即使发生异常，文件也能正确关闭
+- 未正确关闭的文件可能导致资源泄漏或数据丢失
 
-# 使用正斜杠
-path2 = "C:/Users/username/Documents/file.txt"
+正确的文件操作流程不仅可以提高程序的效率，还能避免资源泄漏和数据损坏等问题。推荐始终使用`with`语句处理文件操作，以确保资源的正确释放。
 
-# 使用原始字符串
-path3 = r"C:\Users\username\Documents\file.txt"
-```
+### 文件打开模式
 
-## 7.2 文件的打开与关闭
+| 模式 | 描述 | 文件不存在时 | 文件存在时 |
+|------|------|-------------|------------|
+| 'r' | 只读 | 报错 | 读取 |
+| 'w' | 只写 | 创建 | 覆盖 |
+| 'a' | 追加 | 创建 | 追加 |
+| 'x' | 独占写入 | 创建 | 报错 |
+| 'b' | 二进制模式 | - | - |
+| 't' | 文本模式 | - | - |
+| '+' | 读写模式 | - | - |
 
-### 7.2.1 打开文件
+## 7.2 文本文件操作
 
-Python使用`open()`函数打开文件，返回一个文件对象：
-
-```python
-file = open(filename, mode, encoding=None)
-```
-
-参数说明：
-- `filename`：文件路径
-- `mode`：打开模式
-- `encoding`：文件编码方式
-
-常用的文件打开模式：
-
-| 模式 | 描述 |
-| --- | --- |
-| `'r'` | 只读模式（默认） |
-| `'w'` | 写入模式，会覆盖已有内容 |
-| `'a'` | 追加模式，在文件末尾添加内容 |
-| `'b'` | 二进制模式 |
-| `'t'` | 文本模式（默认） |
-| `'+'` | 读写模式 |
-
-这些模式可以组合使用，如`'rb'`表示以二进制只读模式打开文件。
-
-### 7.2.2 关闭文件
-
-使用`close()`方法关闭文件：
-
-```python
-file = open("example.txt", "r")
-# 文件操作
-file.close()
-```
-
-为了确保文件被正确关闭，推荐使用`with`语句，它会在代码块结束后自动关闭文件：
+### 基本读写操作
 
 ```python
-with open("example.txt", "r") as file:
-    # 文件操作
-    content = file.read()
-# 文件已自动关闭
-```
+# 写入文本文件
+with open('example.txt', 'w', encoding='utf-8') as f:
+    f.write('Hello, Python!\n')
+    f.write('文件操作示例\n')
 
-## 7.3 文件的读取
-
-### 7.3.1 读取整个文件
-
-使用`read()`方法读取整个文件内容：
-
-```python
-with open("example.txt", "r", encoding="utf-8") as file:
-    content = file.read()
+# 读取文本文件
+with open('example.txt', 'r', encoding='utf-8') as f:
+    # 读取全部内容
+    content = f.read()
     print(content)
-```
 
-### 7.3.2 按行读取
-
-使用`readline()`方法读取一行：
-
-```python
-with open("example.txt", "r", encoding="utf-8") as file:
-    line = file.readline()
-    print(line)
-```
-
-使用`readlines()`方法读取所有行并返回一个列表：
-
-```python
-with open("example.txt", "r", encoding="utf-8") as file:
-    lines = file.readlines()
-    for line in lines:
-        print(line.strip())  # strip()去除行尾的换行符
-```
-
-直接遍历文件对象也可以按行读取：
-
-```python
-with open("example.txt", "r", encoding="utf-8") as file:
-    for line in file:
+# 逐行读取
+with open('example.txt', 'r', encoding='utf-8') as f:
+    for line in f:
         print(line.strip())
-```
 
-### 7.3.3 读取指定字节数
-
-`read()`方法可以指定读取的字节数：
-
-```python
-with open("example.txt", "r", encoding="utf-8") as file:
-    chunk = file.read(10)  # 读取前10个字符
+# 读取指定字节数
+with open('example.txt', 'r', encoding='utf-8') as f:
+    chunk = f.read(10)  # 读取10个字符
     print(chunk)
+
+# 文件指针操作
+with open('example.txt', 'r', encoding='utf-8') as f:
+    f.seek(0)  # 移动到文件开头
+    f.tell()   # 获取当前位置
+    f.seek(0, 2)  # 移动到文件末尾
 ```
 
-## 7.4 文件的写入
-
-### 7.4.1 写入文本
-
-使用`write()`方法写入文本：
+### 文件读写方法
 
 ```python
-with open("output.txt", "w", encoding="utf-8") as file:
-    file.write("Hello, World!\n")
-    file.write("This is a new line.")
+# 读取所有行
+with open('example.txt', 'r', encoding='utf-8') as f:
+    lines = f.readlines()
+    print(lines)
+
+# 读取单行
+with open('example.txt', 'r', encoding='utf-8') as f:
+    line = f.readline()
+    print(line)
+
+# 写入多行
+lines = ['行1\n', '行2\n', '行3\n']
+with open('example.txt', 'w', encoding='utf-8') as f:
+    f.writelines(lines)
+
+# 追加内容
+with open('example.txt', 'a', encoding='utf-8') as f:
+    f.write('追加的内容\n')
 ```
 
-### 7.4.2 写入多行
+## 7.3 二进制文件操作
 
-使用`writelines()`方法写入多行：
+### 二进制文件处理
 
 ```python
-lines = ["Line 1\n", "Line 2\n", "Line 3\n"]
-with open("output.txt", "w", encoding="utf-8") as file:
-    file.writelines(lines)
+# 写入二进制文件
+with open('data.bin', 'wb') as f:
+    data = bytes([0, 1, 2, 3, 4])
+    f.write(data)
+
+# 读取二进制文件
+with open('data.bin', 'rb') as f:
+    data = f.read()
+    print(data)
+
+# 图片文件复制示例
+def copy_image(src, dst):
+    with open(src, 'rb') as fsrc:
+        with open(dst, 'wb') as fdst:
+            while True:
+                chunk = fsrc.read(4096)  # 每次读取4KB
+                if not chunk:
+                    break
+                fdst.write(chunk)
 ```
 
-注意：`writelines()`不会自动添加换行符，需要在每行末尾手动添加。
+## 7.4 文件系统操作
 
-## 7.5 文件指针操作
-
-### 7.5.1 获取当前位置
-
-使用`tell()`方法获取文件指针的当前位置：
-
-```python
-with open("example.txt", "r", encoding="utf-8") as file:
-    print(file.tell())  # 0
-    file.read(5)
-    print(file.tell())  # 5
-```
-
-### 7.5.2 移动文件指针
-
-使用`seek()`方法移动文件指针：
-
-```python
-with open("example.txt", "r", encoding="utf-8") as file:
-    file.seek(10)  # 将指针移动到第10个字节
-    print(file.read(5))  # 从第10个字节开始读取5个字节
-```
-
-`seek()`方法的语法为`seek(offset, whence)`：
-- `offset`：偏移量
-- `whence`：起始位置，可选值为：
-  - 0：文件开头（默认）
-  - 1：当前位置
-  - 2：文件末尾
-
-```python
-with open("example.txt", "rb") as file:  # 二进制模式
-    file.seek(-10, 2)  # 从文件末尾向前移动10个字节
-    print(file.read())  # 读取最后10个字节
-```
-
-## 7.6 文件和目录操作
-
-### 7.6.1 os模块
-
-Python的`os`模块提供了与操作系统交互的函数：
+### 路径操作
 
 ```python
 import os
-
-# 获取当前工作目录
-current_dir = os.getcwd()
-print(current_dir)
-
-# 改变当前工作目录
-os.chdir("C:/Users/username/Documents")
-
-# 列出目录内容
-files = os.listdir()
-print(files)
-
-# 创建目录
-os.mkdir("new_folder")
-
-# 删除文件
-os.remove("file.txt")
-
-# 删除空目录
-os.rmdir("empty_folder")
-
-# 重命名文件或目录
-os.rename("old_name.txt", "new_name.txt")
-
-# 检查路径是否存在
-if os.path.exists("file.txt"):
-    print("文件存在")
-
-# 判断是文件还是目录
-if os.path.isfile("file.txt"):
-    print("这是一个文件")
-if os.path.isdir("folder"):
-    print("这是一个目录")
-```
-
-### 7.6.2 os.path模块
-
-`os.path`模块提供了处理文件路径的函数：
-
-```python
 import os.path
 
-# 获取绝对路径
-abs_path = os.path.abspath("file.txt")
-print(abs_path)
+# 路径操作
+path = 'C:/Users/Documents/example.txt'
+print(os.path.dirname(path))   # 目录名
+print(os.path.basename(path))  # 文件名
+print(os.path.split(path))     # 分割路径
+print(os.path.splitext(path))  # 分割扩展名
 
-# 获取目录名
-dir_name = os.path.dirname("C:/Users/username/Documents/file.txt")
-print(dir_name)  # C:/Users/username/Documents
+# 路径判断
+print(os.path.exists(path))    # 是否存在
+print(os.path.isfile(path))    # 是否是文件
+print(os.path.isdir(path))     # 是否是目录
 
-# 获取文件名
-file_name = os.path.basename("C:/Users/username/Documents/file.txt")
-print(file_name)  # file.txt
-
-# 分离目录名和文件名
-dir_name, file_name = os.path.split("C:/Users/username/Documents/file.txt")
-print(dir_name, file_name)  # C:/Users/username/Documents file.txt
-
-# 分离文件名和扩展名
-file_name, ext = os.path.splitext("file.txt")
-print(file_name, ext)  # file .txt
-
-# 拼接路径
-path = os.path.join("C:/Users/username", "Documents", "file.txt")
-print(path)  # C:/Users/username/Documents/file.txt
+# 路径拼接
+dir_path = 'C:/Users/Documents'
+file_name = 'example.txt'
+full_path = os.path.join(dir_path, file_name)
 ```
 
-### 7.6.3 shutil模块
+### 目录操作
 
-`shutil`模块提供了更高级的文件和目录操作：
+```python
+# 创建目录
+os.mkdir('new_directory')           # 创建单个目录
+os.makedirs('path/to/directory')    # 创建多级目录
+
+# 删除操作
+os.remove('file.txt')               # 删除文件
+os.rmdir('empty_directory')         # 删除空目录
+import shutil
+shutil.rmtree('directory')         # 删除目录及内容
+
+# 遍历目录
+for root, dirs, files in os.walk('.'):
+    print(f'当前目录: {root}')
+    print(f'子目录: {dirs}')
+    print(f'文件: {files}')
+
+# 列出目录内容
+print(os.listdir('.'))              # 列出当前目录内容
+```
+
+## 7.5 高级文件操作
+
+### 文件属性和权限
+
+```python
+import os
+import time
+
+# 获取文件信息
+stat = os.stat('example.txt')
+print(f'大小: {stat.st_size} 字节')
+print(f'创建时间: {time.ctime(stat.st_ctime)}')
+print(f'修改时间: {time.ctime(stat.st_mtime)}')
+print(f'访问时间: {time.ctime(stat.st_atime)}')
+
+# 修改文件权限
+os.chmod('example.txt', 0o755)  # 修改权限为755
+```
+
+### 文件操作实用函数
 
 ```python
 import shutil
 
-# 复制文件
-shutil.copy("source.txt", "destination.txt")
+# 文件复制
+shutil.copy('src.txt', 'dst.txt')         # 复制文件
+shutil.copy2('src.txt', 'dst.txt')        # 复制文件及元数据
+shutil.copyfile('src.txt', 'dst.txt')     # 仅复制内容
 
-# 复制文件，保留元数据
-shutil.copy2("source.txt", "destination.txt")
+# 移动文件
+shutil.move('src.txt', 'dst.txt')
 
-# 复制目录
-shutil.copytree("source_dir", "destination_dir")
-
-# 移动文件或目录
-shutil.move("source.txt", "destination.txt")
-
-# 删除目录及其内容
-shutil.rmtree("directory")
+# 修改文件名
+os.rename('old.txt', 'new.txt')
 ```
 
-## 7.7 文件的其他操作
+## 7.6 文件操作最佳实践
 
-### 7.7.1 临时文件
-
-`tempfile`模块提供了创建临时文件和目录的函数：
+### 异常处理
 
 ```python
-import tempfile
+# 安全的文件操作
+try:
+    with open('example.txt', 'r') as f:
+        content = f.read()
+except FileNotFoundError:
+    print('文件不存在')
+except PermissionError:
+    print('没有权限访问文件')
+except Exception as e:
+    print(f'发生错误：{str(e)}')
 
-# 创建临时文件
-with tempfile.TemporaryFile() as temp:
-    temp.write(b"Hello, World!")
-    temp.seek(0)
-    print(temp.read())  # b'Hello, World!'
-
-# 创建命名临时文件
-with tempfile.NamedTemporaryFile() as temp:
-    print(temp.name)  # 临时文件的路径
-
-# 创建临时目录
-with tempfile.TemporaryDirectory() as temp_dir:
-    print(temp_dir)  # 临时目录的路径
+# 文件备份
+def backup_file(filename):
+    import time
+    timestamp = time.strftime('%Y%m%d_%H%M%S')
+    backup_name = f'{filename}.{timestamp}.bak'
+    try:
+        shutil.copy2(filename, backup_name)
+        return True
+    except Exception as e:
+        print(f'备份失败：{str(e)}')
+        return False
 ```
 
-### 7.7.2 文件压缩与解压
-
-Python提供了多个模块处理压缩文件：
+### 文件操作工具函数
 
 ```python
-# 使用zipfile模块处理ZIP文件
-import zipfile
+def safe_delete(path):
+    """安全删除文件或目录"""
+    try:
+        if os.path.isfile(path):
+            os.remove(path)
+        elif os.path.isdir(path):
+            shutil.rmtree(path)
+        return True
+    except Exception as e:
+        print(f'删除失败：{str(e)}')
+        return False
 
-# 创建ZIP文件
-with zipfile.ZipFile("archive.zip", "w") as zip_file:
-    zip_file.write("file1.txt")
-    zip_file.write("file2.txt")
+def get_file_size(path, unit='bytes'):
+    """获取文件大小，支持不同单位"""
+    size = os.path.getsize(path)
+    units = {
+        'bytes': 1,
+        'kb': 1024,
+        'mb': 1024 * 1024,
+        'gb': 1024 * 1024 * 1024
+    }
+    return size / units.get(unit.lower(), 1)
 
-# 解压ZIP文件
-with zipfile.ZipFile("archive.zip", "r") as zip_file:
-    zip_file.extractall("extracted_folder")
-
-# 列出ZIP文件内容
-with zipfile.ZipFile("archive.zip", "r") as zip_file:
-    print(zip_file.namelist())
+def create_unique_file(directory, prefix='file', extension='.txt'):
+    """创建唯一文件名"""
+    import uuid
+    while True:
+        filename = f'{prefix}_{uuid.uuid4().hex[:8]}{extension}'
+        path = os.path.join(directory, filename)
+        if not os.path.exists(path):
+            return path
 ```
+
+## 7.7 文件操作应用实例
+
+### 文件监控系统
 
 ```python
-# 使用tarfile模块处理TAR文件
-import tarfile
+import time
+from watchdog.observers import Observer
+from watchdog.events import FileSystemEventHandler
 
-# 创建TAR文件
-with tarfile.open("archive.tar.gz", "w:gz") as tar:
-    tar.add("file1.txt")
-    tar.add("file2.txt")
+class MyHandler(FileSystemEventHandler):
+    def on_created(self, event):
+        if not event.is_directory:
+            print(f'文件创建: {event.src_path}')
+    
+    def on_modified(self, event):
+        if not event.is_directory:
+            print(f'文件修改: {event.src_path}')
+    
+    def on_deleted(self, event):
+        if not event.is_directory:
+            print(f'文件删除: {event.src_path}')
 
-# 解压TAR文件
-with tarfile.open("archive.tar.gz", "r:gz") as tar:
-    tar.extractall("extracted_folder")
-
-# 列出TAR文件内容
-with tarfile.open("archive.tar.gz", "r:gz") as tar:
-    print(tar.getnames())
+def monitor_directory(path):
+    event_handler = MyHandler()
+    observer = Observer()
+    observer.schedule(event_handler, path, recursive=False)
+    observer.start()
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()
 ```
 
-## 7.8 CSV文件操作
-
-CSV（Comma-Separated Values）是一种常用的数据交换格式。Python的`csv`模块提供了处理CSV文件的功能：
+### 文件批处理
 
 ```python
-import csv
+def batch_process_files(directory, extensions=None):
+    """批量处理指定目录下的文件"""
+    if extensions is None:
+        extensions = ['.txt', '.log']
+    
+    processed = 0
+    for root, _, files in os.walk(directory):
+        for file in files:
+            if any(file.endswith(ext) for ext in extensions):
+                file_path = os.path.join(root, file)
+                try:
+                    # 处理文件
+                    process_file(file_path)
+                    processed += 1
+                except Exception as e:
+                    print(f'处理文件 {file} 时出错: {str(e)}')
+    return processed
 
-# 写入CSV文件
-with open("data.csv", "w", newline="") as file:
-    writer = csv.writer(file)
-    writer.writerow(["Name", "Age", "City"])
-    writer.writerow(["Alice", 25, "New York"])
-    writer.writerow(["Bob", 30, "London"])
-
-# 读取CSV文件
-with open("data.csv", "r") as file:
-    reader = csv.reader(file)
-    for row in reader:
-        print(row)
-
-# 使用字典读写CSV文件
-with open("data.csv", "w", newline="") as file:
-    fieldnames = ["Name", "Age", "City"]
-    writer = csv.DictWriter(file, fieldnames=fieldnames)
-    writer.writeheader()
-    writer.writerow({"Name": "Alice", "Age": 25, "City": "New York"})
-    writer.writerow({"Name": "Bob", "Age": 30, "City": "London"})
-
-with open("data.csv", "r") as file:
-    reader = csv.DictReader(file)
-    for row in reader:
-        print(row["Name"], row["Age"], row["City"])
+def process_file(file_path):
+    """处理单个文件的具体操作"""
+    with open(file_path, 'r', encoding='utf-8') as f:
+        content = f.read()
+        # 进行处理...
+    
+    # 处理后保存
+    with open(file_path, 'w', encoding='utf-8') as f:
+        f.write(processed_content)
 ```
-
-## 7.9 JSON文件操作
-
-JSON（JavaScript Object Notation）是一种轻量级的数据交换格式。Python的`json`模块提供了处理JSON数据的功能：
-
-```python
-import json
-
-# Python对象转JSON字符串
-data = {
-    "name": "Alice",
-    "age": 25,
-    "city": "New York",
-    "languages": ["Python", "JavaScript", "C++"],
-    "is_student": False
-}
-
-json_str = json.dumps(data, indent=4)
-print(json_str)
-
-# 写入JSON文件
-with open("data.json", "w") as file:
-    json.dump(data, file, indent=4)
-
-# JSON字符串转Python对象
-json_str = '{"name": "Bob", "age": 30, "city": "London"}'
-obj = json.loads(json_str)
-print(obj["name"])  # Bob
-
-# 读取JSON文件
-with open("data.json", "r") as file:
-    obj = json.load(file)
-    print(obj["name"])  # Alice
-```
-
-## 7.10 课后练习
-
-1. 编写一个程序，统计文本文件中的字符数、单词数和行数。
-2. 创建一个程序，将一个文本文件的内容复制到另一个文件，同时将所有字母转换为大写。
-3. 编写一个程序，读取CSV文件，并计算每列数值的平均值。
-4. 创建一个程序，遍历指定目录及其子目录，列出所有指定扩展名的文件。
-5. 编写一个程序，读取JSON文件，修改其中的某些值，然后保存回文件。

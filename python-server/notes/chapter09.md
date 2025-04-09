@@ -1,516 +1,381 @@
-# 第9章 模块和包
+# 第9章 GUI编程
 
-## 9.1 模块基础
+## 9.1 tkinter基础
 
-### 9.1.1 什么是模块
+### GUI编程概述
 
-模块是一个包含Python定义和语句的文件，可以被其他Python程序导入和使用。模块的文件名就是模块名加上`.py`后缀。模块允许你将代码分割成相关的部分，提高代码的可维护性和重用性。
+```mermaid
+flowchart TB
+    A[GUI程序结构] --> B[窗口创建]
+    B --> C[组件布局]
+    C --> D[事件绑定]
+    D --> E[主循环]
+    C --> F[组件类型]
+    F --> G[基础组件]
+    F --> H[容器组件]
+    F --> I[菜单组件]
+```
 
-### 9.1.2 模块的导入
+### tkinter基本组件
 
-Python提供了多种导入模块的方式：
+| 组件类型 | 类名 | 用途 |
+|----------|------|------|
+| 标签 | Label | 显示文本或图像 |
+| 按钮 | Button | 触发动作 |
+| 输入框 | Entry | 单行文本输入 |
+| 文本框 | Text | 多行文本输入 |
+| 列表框 | Listbox | 选择列表项 |
+| 单选框 | Radiobutton | 单选 |
+| 复选框 | Checkbutton | 多选 |
+| 菜单 | Menu | 下拉菜单 |
+| 框架 | Frame | 组件容器 |
+
+### 基本窗口创建
 
 ```python
-# 导入整个模块
-import math
-print(math.pi)  # 使用模块中的变量
-
-# 导入模块中的特定项
-from math import pi, sqrt
-print(pi)  # 直接使用导入的变量
-print(sqrt(16))  # 直接使用导入的函数
-
-# 导入模块中的所有内容（不推荐）
-from math import *
-print(pi)
-print(sqrt(16))
-
-# 使用别名
-import math as m
-print(m.pi)
-
-from math import sqrt as square_root
-print(square_root(16))
-```
-
-### 9.1.3 模块搜索路径
-
-Python解释器在导入模块时会按照以下顺序搜索模块：
-
-1. 当前目录
-2. 环境变量PYTHONPATH中的目录
-3. Python标准库目录
-4. 第三方包安装目录（如site-packages）
-
-可以通过`sys.path`查看和修改模块搜索路径：
-
-```python
-import sys
-print(sys.path)  # 查看当前的模块搜索路径
-
-# 添加自定义路径
-sys.path.append('/path/to/my/modules')
-```
-
-## 9.2 创建和使用模块
-
-### 9.2.1 创建自己的模块
-
-创建模块非常简单，只需编写一个`.py`文件：
-
-```python
-# mymodule.py
-def greeting(name):
-    return f"Hello, {name}!"
-
-def add(a, b):
-    return a + b
-
-PI = 3.14159
-
-class Circle:
-    def __init__(self, radius):
-        self.radius = radius
-    
-    def area(self):
-        return PI * self.radius ** 2
-```
-
-### 9.2.2 使用自定义模块
-
-```python
-# 导入自定义模块
-import mymodule
-
-print(mymodule.greeting("Alice"))  # Hello, Alice!
-print(mymodule.add(5, 3))  # 8
-print(mymodule.PI)  # 3.14159
-
-circle = mymodule.Circle(5)
-print(circle.area())  # 78.53975
-```
-
-### 9.2.3 模块的`__name__`属性
-
-每个模块都有一个`__name__`属性。当模块被直接运行时，`__name__`的值为`"__main__"`；当模块被导入时，`__name__`的值为模块名。
-
-这个特性常用于编写既可以作为模块导入，又可以作为脚本直接运行的代码：
-
-```python
-# mymodule.py
-def greeting(name):
-    return f"Hello, {name}!"
-
-def add(a, b):
-    return a + b
-
-PI = 3.14159
-
-class Circle:
-    def __init__(self, radius):
-        self.radius = radius
-    
-    def area(self):
-        return PI * self.radius ** 2
-
-# 当模块被直接运行时执行
-if __name__ == "__main__":
-    print(greeting("World"))
-    print(f"5 + 3 = {add(5, 3)}")
-    c = Circle(3)
-    print(f"Circle area: {c.area()}")
-```
-
-## 9.3 包
-
-### 9.3.1 什么是包
-
-包是一种组织Python模块的方式，是一个包含多个模块的目录。一个包必须包含一个特殊的文件`__init__.py`（在Python 3.3+中这个文件可以为空或者省略，但为了兼容性，建议保留）。
-
-包的结构示例：
-
-```
-mypackage/
-    __init__.py
-    module1.py
-    module2.py
-    subpackage/
-        __init__.py
-        module3.py
-        module4.py
-```
-
-### 9.3.2 创建包
-
-创建一个简单的包：
-
-1. 创建包目录结构
-2. 在每个目录中创建`__init__.py`文件
-3. 添加模块文件
-
-```python
-# mypackage/__init__.py
-# 可以为空，也可以包含包级别的初始化代码
-print("Initializing mypackage")
-
-# mypackage/module1.py
-def function1():
-    return "This is function1 from module1"
-
-# mypackage/module2.py
-def function2():
-    return "This is function2 from module2"
-
-# mypackage/subpackage/__init__.py
-print("Initializing subpackage")
-
-# mypackage/subpackage/module3.py
-def function3():
-    return "This is function3 from module3"
-```
-
-### 9.3.3 导入包
-
-```python
-# 导入包
-import mypackage
-
-# 导入包中的模块
-import mypackage.module1
-print(mypackage.module1.function1())
-
-# 导入子包中的模块
-import mypackage.subpackage.module3
-print(mypackage.subpackage.module3.function3())
-
-# 使用from导入
-from mypackage import module2
-print(module2.function2())
-
-from mypackage.subpackage.module3 import function3
-print(function3())
-```
-
-### 9.3.4 相对导入
-
-在包内部的模块之间可以使用相对导入：
-
-```python
-# mypackage/subpackage/module4.py
-# 相对导入同级模块
-from . import module3
-
-# 相对导入上级包的模块
-from .. import module1
-
-def function4():
-    return f"Function4 calls: {module3.function3()} and {module1.function1()}"
-```
-
-## 9.4 标准库
-
-### 9.4.1 Python标准库概述
-
-Python标准库是Python安装时自带的一组模块和包，提供了丰富的功能。以下是一些常用的标准库模块：
-
-| 模块名 | 描述 |
-| --- | --- |
-| `os` | 操作系统接口 |
-| `sys` | 系统特定参数和函数 |
-| `math` | 数学函数 |
-| `random` | 生成伪随机数 |
-| `datetime` | 日期和时间处理 |
-| `collections` | 特殊容器数据类型 |
-| `itertools` | 高效循环的迭代器函数 |
-| `functools` | 高阶函数和可调用对象上的操作 |
-| `re` | 正则表达式 |
-| `json` | JSON编码和解码 |
-| `pickle` | Python对象序列化 |
-| `sqlite3` | SQLite数据库接口 |
-| `urllib` | URL处理模块 |
-| `email` | 电子邮件和MIME处理 |
-| `logging` | 日志记录 |
-| `threading` | 线程化编程 |
-| `multiprocessing` | 基于进程的并行处理 |
-
-### 9.4.2 常用标准库示例
-
-#### os模块
-
-```python
-import os
-
-# 获取当前工作目录
-print(os.getcwd())
-
-# 列出目录内容
-print(os.listdir('.'))
-
-# 创建目录
-os.mkdir('new_folder')
-
-# 重命名文件或目录
-os.rename('old_name.txt', 'new_name.txt')
-
-# 删除文件
-os.remove('file.txt')
-
-# 执行系统命令
-os.system('echo Hello, World!')
-```
-
-#### datetime模块
-
-```python
-from datetime import datetime, timedelta
-
-# 获取当前日期和时间
-now = datetime.now()
-print(now)
-
-# 创建特定的日期
-date = datetime(2023, 1, 1, 12, 0, 0)
-print(date)
-
-# 日期格式化
-print(now.strftime('%Y-%m-%d %H:%M:%S'))
-
-# 日期计算
-tomorrow = now + timedelta(days=1)
-print(tomorrow)
-```
-
-#### random模块
-
-```python
-import random
-
-# 生成随机整数
-print(random.randint(1, 10))
-
-# 从序列中随机选择一个元素
-print(random.choice(['apple', 'banana', 'cherry']))
-
-# 随机打乱序列
-list1 = [1, 2, 3, 4, 5]
-random.shuffle(list1)
-print(list1)
-
-# 生成随机浮点数
-print(random.random())  # 0.0 到 1.0 之间
-print(random.uniform(1.0, 10.0))  # 1.0 到 10.0 之间
-```
-
-#### collections模块
-
-```python
-from collections import Counter, defaultdict, namedtuple
-
-# Counter：计数器
-words = ['apple', 'banana', 'apple', 'cherry', 'apple', 'banana']
-counter = Counter(words)
-print(counter)  # Counter({'apple': 3, 'banana': 2, 'cherry': 1})
-print(counter.most_common(2))  # [('apple', 3), ('banana', 2)]
-
-# defaultdict：带默认值的字典
-dd = defaultdict(list)
-dd['a'].append(1)
-dd['a'].append(2)
-dd['b'].append(4)
-print(dd)  # defaultdict(<class 'list'>, {'a': [1, 2], 'b': [4]})
-
-# namedtuple：命名元组
-Person = namedtuple('Person', ['name', 'age', 'gender'])
-p = Person('Alice', 25, 'female')
-print(p.name)  # Alice
-print(p.age)  # 25
-print(p)  # Person(name='Alice', age=25, gender='female')
-```
-
-## 9.5 第三方包
-
-### 9.5.1 安装第三方包
-
-Python使用pip包管理器安装第三方包：
-
-```bash
-# 安装包
-pip install package_name
-
-# 安装特定版本
-pip install package_name==1.0.0
-
-# 升级包
-pip install --upgrade package_name
-
-# 卸载包
-pip uninstall package_name
-
-# 列出已安装的包
-pip list
-
-# 查看包信息
-pip show package_name
-```
-
-### 9.5.2 常用第三方包
-
-以下是一些流行的第三方包：
-
-| 包名 | 描述 |
-| --- | --- |
-| `numpy` | 科学计算基础库，提供多维数组对象和相关工具 |
-| `pandas` | 数据分析和操作工具 |
-| `matplotlib` | 绘图库 |
-| `requests` | HTTP库 |
-| `beautifulsoup4` | HTML和XML解析库 |
-| `flask` | 轻量级Web应用框架 |
-| `django` | 全功能Web应用框架 |
-| `sqlalchemy` | SQL工具包和ORM |
-| `pytest` | 测试框架 |
-| `pillow` | 图像处理库 |
-| `scikit-learn` | 机器学习库 |
-| `tensorflow` | 深度学习框架 |
-| `pytorch` | 深度学习框架 |
-
-### 9.5.3 使用虚拟环境
-
-虚拟环境是Python的一个重要特性，它允许你为不同的项目创建隔离的Python环境，避免包版本冲突：
-
-```bash
-# 创建虚拟环境
-python -m venv myenv
-
-# 激活虚拟环境（Windows）
-myenv\Scripts\activate
-
-# 激活虚拟环境（Unix/MacOS）
-source myenv/bin/activate
-
-# 安装包
-pip install package_name
-
-# 退出虚拟环境
-deactivate
-```
-
-## 9.6 发布自己的包
-
-### 9.6.1 包的结构
-
-一个标准的Python包结构：
-
-```
-mypackage/
-    setup.py
-    README.md
-    LICENSE
-    mypackage/
-        __init__.py
-        module1.py
-        module2.py
-    tests/
-        __init__.py
-        test_module1.py
-        test_module2.py
-```
-
-### 9.6.2 创建setup.py
-
-`setup.py`是包的安装脚本，包含了包的元数据：
-
-```python
-from setuptools import setup, find_packages
-
-setup(
-    name="mypackage",
-    version="0.1.0",
-    author="Your Name",
-    author_email="your.email@example.com",
-    description="A short description of the package",
-    long_description=open("README.md").read(),
-    long_description_content_type="text/markdown",
-    url="https://github.com/yourusername/mypackage",
-    packages=find_packages(),
-    classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
-    ],
-    python_requires=">=3.6",
-    install_requires=[
-        "numpy",
-        "pandas",
-    ],
-)
-```
-
-### 9.6.3 构建和发布包
-
-```bash
-# 安装构建工具
-pip install setuptools wheel twine
-
-# 构建包
-python setup.py sdist bdist_wheel
-
-# 上传到PyPI测试服务器
-twine upload --repository-url https://test.pypi.org/legacy/ dist/*
-
-# 上传到PyPI
-twine upload dist/*
-```
-
-## 9.7 模块设计最佳实践
-
-### 9.7.1 模块设计原则
-
-1. **单一职责原则**：一个模块应该只有一个明确的职责
-2. **接口清晰**：提供清晰的API和文档
-3. **封装内部实现**：使用下划线前缀标记内部使用的函数和变量
-4. **提供文档**：使用文档字符串记录模块、类和函数的用途
-
-### 9.7.2 文档字符串
-
-```python
-def calculate_area(length, width):
-    """
-    计算矩形的面积。
-    
-    参数:
-        length (float): 矩形的长度
-        width (float): 矩形的宽度
+import tkinter as tk
+from tkinter import ttk
+
+class MainWindow:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("My First GUI")
+        self.root.geometry("400x300")
         
-    返回:
-        float: 矩形的面积
+        # 创建组件
+        self.label = tk.Label(self.root, text="Hello, tkinter!")
+        self.label.pack()
         
-    示例:
-        >>> calculate_area(5, 3)
-        15.0
-    """
-    return length * width
+        self.button = tk.Button(self.root, text="Click Me!", command=self.button_click)
+        self.button.pack()
+    
+    def button_click(self):
+        print("Button clicked!")
+    
+    def run(self):
+        self.root.mainloop()
+
+if __name__ == '__main__':
+    app = MainWindow()
+    app.run()
 ```
 
-### 9.7.3 导入约定
+## 9.2 布局管理
+
+### 布局管理器
+
+```mermaid
+flowchart LR
+    A[布局管理器] --> B[pack]
+    A --> C[grid]
+    A --> D[place]
+    
+    B --> E[按顺序排列]
+    B --> B1[side参数]
+    B --> B2[fill参数]
+    B --> B3[expand参数]
+    B --> B4[anchor参数]
+    
+    C --> F[网格布局]
+    C --> C1[row/column参数]
+    C --> C2[rowspan/columnspan]
+    C --> C3[sticky参数]
+    C --> C4[padx/pady参数]
+    
+    D --> G[绝对定位]
+    D --> D1[x/y坐标]
+    D --> D2[relx/rely参数]
+    D --> D3[width/height参数]
+    D --> D4[anchor参数]
+```
+
+tkinter提供了三种主要的布局管理器，每种都有其特定的用途和优势：
+
+### 1. pack布局管理器
+- **基本原理**：按照添加顺序将组件打包到父容器中
+- **主要参数**：
+  - `side`：指定组件的放置方向（`'top'`, `'bottom'`, `'left'`, `'right'`）
+  - `fill`：指定组件填充方向（`'x'`, `'y'`, `'both'`, `'none'`）
+  - `expand`：是否允许组件扩展占用额外空间（`True`/`False`）
+  - `anchor`：组件在分配空间内的定位点（`'n'`, `'s'`, `'e'`, `'w'`, `'ne'`等）
+- **适用场景**：
+  - 简单的界面布局，如工具栏、按钮栏
+  - 组件需要按照一定顺序排列的情况
+  - 自适应大小的界面
+
+### 2. grid布局管理器
+- **基本原理**：将父容器划分为网格，通过行列坐标放置组件
+- **主要参数**：
+  - `row`/`column`：指定组件放置的行列位置
+  - `rowspan`/`columnspan`：指定组件跨越的行数/列数
+  - `sticky`：组件在网格中的对齐方式（`'n'`, `'s'`, `'e'`, `'w'`或组合）
+  - `padx`/`pady`：组件与网格边缘的水平/垂直间距
+- **适用场景**：
+  - 表单界面
+  - 需要精确控制组件位置的复杂界面
+  - 类似表格的数据展示
+
+### 3. place布局管理器
+- **基本原理**：通过绝对或相对坐标精确定位组件
+- **主要参数**：
+  - `x`/`y`：组件左上角的绝对坐标
+  - `relx`/`rely`：组件左上角的相对坐标（0.0到1.0）
+  - `width`/`height`：组件的宽度/高度
+  - `relwidth`/`relheight`：相对于父容器的宽度/高度比例
+  - `anchor`：组件的定位锚点
+- **适用场景**：
+  - 需要精确定位的特殊界面
+  - 绝对位置不变的固定布局
+  - 自定义绘图或动画界面
+
+选择合适的布局管理器对于创建美观、响应式的GUI界面至关重要。通常，grid布局是最灵活的选择，适用于大多数复杂界面；pack布局适合简单的线性排列；place布局则用于需要精确控制的特殊情况。
+
+### 布局示例
 
 ```python
-# 标准库导入
-import os
-import sys
+# pack布局
+class PackLayoutDemo:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("Pack Layout Demo")
+        
+        # 顶部按钮
+        tk.Button(self.root, text="Top").pack(side="top")
+        # 底部按钮
+        tk.Button(self.root, text="Bottom").pack(side="bottom")
+        # 左侧按钮
+        tk.Button(self.root, text="Left").pack(side="left")
+        # 右侧按钮
+        tk.Button(self.root, text="Right").pack(side="right")
 
-# 第三方库导入
-import numpy as np
-import pandas as pd
+# grid布局
+class GridLayoutDemo:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("Grid Layout Demo")
+        
+        # 创建标签和输入框
+        tk.Label(self.root, text="用户名：").grid(row=0, column=0)
+        tk.Entry(self.root).grid(row=0, column=1)
+        
+        tk.Label(self.root, text="密码：").grid(row=1, column=0)
+        tk.Entry(self.root, show="*").grid(row=1, column=1)
+        
+        tk.Button(self.root, text="登录").grid(row=2, column=0, columnspan=2)
 
-# 本地应用/库特定导入
-from mypackage import module1
-from mypackage.subpackage import module2
+# place布局
+class PlaceLayoutDemo:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("Place Layout Demo")
+        
+        # 绝对定位
+        tk.Button(self.root, text="Button 1").place(x=10, y=10)
+        tk.Button(self.root, text="Button 2").place(x=100, y=100)
 ```
 
-## 9.8 课后练习
+## 9.3 事件处理
 
-1. 创建一个名为`calculator`的模块，包含加、减、乘、除四个基本运算函数，并在另一个Python文件中导入并使用这些函数。
-2. 创建一个包含多个模块的包，实现一个简单的文件管理系统，包括文件创建、读取、写入和删除功能。
-3. 使用标准库中的`datetime`模块编写一个程序，计算两个日期之间的天数差异。
-4. 使用`collections`模块中的`Counter`类统计一个文本文件中每个单词出现的频率。
-5. 安装一个第三方包（如`requests`），并编写一个简单的程序使用该包获取网页内容。
+### 事件类型
+
+| 事件 | 描述 | 示例 |
+|------|------|------|
+| <Button-1> | 鼠标左键点击 | widget.bind('<Button-1>', handler) |
+| <Button-3> | 鼠标右键点击 | widget.bind('<Button-3>', handler) |
+| <KeyPress> | 键盘按键 | widget.bind('<KeyPress>', handler) |
+| <Return> | 回车键 | widget.bind('<Return>', handler) |
+| <Motion> | 鼠标移动 | widget.bind('<Motion>', handler) |
+
+### 事件处理示例
+
+```python
+class EventDemo:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("Event Demo")
+        
+        self.canvas = tk.Canvas(self.root, width=300, height=200)
+        self.canvas.pack()
+        
+        # 绑定事件
+        self.canvas.bind('<Button-1>', self.left_click)
+        self.canvas.bind('<B1-Motion>', self.drag)
+        self.canvas.bind('<ButtonRelease-1>', self.release)
+    
+    def left_click(self, event):
+        self.last_x = event.x
+        self.last_y = event.y
+    
+    def drag(self, event):
+        self.canvas.create_line(self.last_x, self.last_y,
+                               event.x, event.y)
+        self.last_x = event.x
+        self.last_y = event.y
+    
+    def release(self, event):
+        print("Drawing finished")
+```
+
+## 9.4 高级组件
+
+### 对话框
+
+```python
+from tkinter import messagebox, filedialog
+
+class DialogDemo:
+    def __init__(self):
+        self.root = tk.Tk()
+        
+        # 消息框
+        tk.Button(self.root, text="显示信息",
+                  command=self.show_info).pack()
+        tk.Button(self.root, text="显示警告",
+                  command=self.show_warning).pack()
+        tk.Button(self.root, text="显示错误",
+                  command=self.show_error).pack()
+        
+        # 文件对话框
+        tk.Button(self.root, text="打开文件",
+                  command=self.open_file).pack()
+        tk.Button(self.root, text="保存文件",
+                  command=self.save_file).pack()
+    
+    def show_info(self):
+        messagebox.showinfo("信息", "这是一条信息")
+    
+    def show_warning(self):
+        messagebox.showwarning("警告", "这是一条警告")
+    
+    def show_error(self):
+        messagebox.showerror("错误", "这是一条错误")
+    
+    def open_file(self):
+        filename = filedialog.askopenfilename()
+        if filename:
+            print(f"打开文件：{filename}")
+    
+    def save_file(self):
+        filename = filedialog.asksaveasfilename()
+        if filename:
+            print(f"保存文件：{filename}")
+```
+
+## 9.5 实际应用案例
+
+### 简单计算器
+
+```python
+class Calculator:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("计算器")
+        
+        # 显示框
+        self.display = tk.Entry(self.root, width=35, justify="right")
+        self.display.grid(row=0, column=0, columnspan=4, padx=5, pady=5)
+        
+        # 按钮布局
+        buttons = [
+            '7', '8', '9', '/',
+            '4', '5', '6', '*',
+            '1', '2', '3', '-',
+            '0', '.', '=', '+'
+        ]
+        
+        row = 1
+        col = 0
+        for button in buttons:
+            cmd = lambda x=button: self.click(x)
+            tk.Button(self.root, text=button, width=5,
+                      command=cmd).grid(row=row, column=col)
+            col += 1
+            if col > 3:
+                col = 0
+                row += 1
+    
+    def click(self, key):
+        if key == '=':
+            try:
+                result = eval(self.display.get())
+                self.display.delete(0, tk.END)
+                self.display.insert(tk.END, str(result))
+            except:
+                self.display.delete(0, tk.END)
+                self.display.insert(tk.END, "Error")
+        else:
+            self.display.insert(tk.END, key)
+
+# 运行计算器
+if __name__ == '__main__':
+    calc = Calculator()
+    calc.root.mainloop()
+```
+
+### 文本编辑器
+
+```python
+class TextEditor:
+    def __init__(self):
+        self.root = tk.Tk()
+        self.root.title("文本编辑器")
+        
+        # 创建菜单栏
+        self.create_menu()
+        
+        # 创建文本框
+        self.text = tk.Text(self.root)
+        self.text.pack(expand=True, fill='both')
+        
+        # 创建滚动条
+        scrollbar = tk.Scrollbar(self.text)
+        scrollbar.pack(side=tk.RIGHT, fill=tk.Y)
+        
+        # 连接文本框和滚动条
+        self.text.config(yscrollcommand=scrollbar.set)
+        scrollbar.config(command=self.text.yview)
+    
+    def create_menu(self):
+        menubar = tk.Menu(self.root)
+        
+        # 文件菜单
+        filemenu = tk.Menu(menubar, tearoff=0)
+        filemenu.add_command(label="新建", command=self.new_file)
+        filemenu.add_command(label="打开", command=self.open_file)
+        filemenu.add_command(label="保存", command=self.save_file)
+        filemenu.add_separator()
+        filemenu.add_command(label="退出", command=self.root.quit)
+        menubar.add_cascade(label="文件", menu=filemenu)
+        
+        # 编辑菜单
+        editmenu = tk.Menu(menubar, tearoff=0)
+        editmenu.add_command(label="剪切", command=lambda: self.text.event_generate("<<Cut>>"))
+        editmenu.add_command(label="复制", command=lambda: self.text.event_generate("<<Copy>>"))
+        editmenu.add_command(label="粘贴", command=lambda: self.text.event_generate("<<Paste>>"))
+        menubar.add_cascade(label="编辑", menu=editmenu)
+        
+        self.root.config(menu=menubar)
+    
+    def new_file(self):
+        self.text.delete(1.0, tk.END)
+    
+    def open_file(self):
+        file = filedialog.askopenfile(mode='r')
+        if file:
+            content = file.read()
+            self.text.delete(1.0, tk.END)
+            self.text.insert(1.0, content)
+            file.close()
+    
+    def save_file(self):
+        file = filedialog.asksaveasfile(mode='w')
+        if file:
+            content = self.text.get(1.0, tk.END)
+            file.write(content)
+            file.close()
+
+# 运行文本编辑器
+if __name__ == '__main__':
+    editor = TextEditor()
+    editor.root.mainloop()
+```
