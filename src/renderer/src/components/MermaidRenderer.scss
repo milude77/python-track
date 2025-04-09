@@ -14,8 +14,12 @@
 }
 
 html[data-theme=dark] [id^=mermaid-] {
-  .node path, rect {
+  .node path, rect, polygon {
     fill: #333 !important;
+  }
+  .label p {
+    color: #FFFFFF;
+    background-color: #333 !important;
   }
   .relation, .flowchart-link {
     stroke: #d8d7d7 !important;
