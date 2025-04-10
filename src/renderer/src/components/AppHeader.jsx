@@ -7,29 +7,11 @@ import {
 } from '@ant-design/icons'
 import './AppHeader.scss'
 import icon from '../../../../resources/python-logo.svg?asset'
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 const { Header } = Layout
 const { Title } = Typography
 const AppHeader = () => {
   const [isMaximized, setIsMaximized] = useState(false)
-
-  // 监听窗口状态变化
-  useEffect(() => {
-    const handleResize = () => {
-      // 这里简单通过窗口尺寸判断是否最大化
-      // 实际应用中可能需要更复杂的逻辑
-      const width = window.innerWidth
-      const height = window.innerHeight
-      const screenWidth = window.screen.availWidth
-      const screenHeight = window.screen.availHeight
-      setIsMaximized(width >= screenWidth * 0.9 && height >= screenHeight * 0.9)
-    }
-
-    window.addEventListener('resize', handleResize)
-    handleResize() // 初始检查
-
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
 
   // 窗口控制函数
   const handleMinimize = () => {

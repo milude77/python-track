@@ -372,7 +372,7 @@ app.whenReady().then(() => {
       }
     }
   })
-  
+
   // 保存Python代码到本地文件
   ipcMain.handle('save-code-to-file', async (event, code) => {
     try {
@@ -400,7 +400,7 @@ app.whenReady().then(() => {
   })
 
   // 从本地文件导入Python代码
-  ipcMain.handle('import-code-from-file', async (event) => {
+  ipcMain.handle('import-code-from-file', async () => {
     try {
       const win = BrowserWindow.getFocusedWindow()
       if (!win) return { success: false, message: '无法获取当前窗口' }
