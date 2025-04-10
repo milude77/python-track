@@ -7,7 +7,7 @@ import 'prismjs/plugins/autoloader/prism-autoloader'
 import { theme } from 'antd'
 import { toast } from '../plugins/toast'
 import MermaidRenderer from './MermaidRenderer'
-
+import './MarkdownRenderer.scss'
 // 配置必须在模块作用域
 Prism.plugins.autoloader.languages_path =
   'https://cdnjs.cloudflare.com/ajax/libs/prism/1.29.0/components/'
@@ -68,7 +68,7 @@ const MarkdownRenderer = memo(({ content }) => {
   // 组件样式定义
   const headingStyle = {
     ...baseStyle,
-    margin: '1.2em 0 0.6em',
+    margin: '0.4rem 0 0.6em',
     lineHeight: 1.2
   }
 
