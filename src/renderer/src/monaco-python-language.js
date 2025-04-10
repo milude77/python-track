@@ -279,12 +279,21 @@ function initPythonLanguage() {
           }
         ],
 
-        // 字符串 - 引号
+        // 双引号字符串
         [
-          /([uUbBrRfF]+)?(["'])/,
+          /([uUbBrRfF]+)?(")/,
           {
             token: 'string.python',
-            next: '@string.$2'
+            next: '@string.double'
+          }
+        ],
+
+        // 单引号字符串
+        [
+          /([uUbBrRfF]+)?(')/,
+          {
+            token: 'string.python',
+            next: '@string.single'
           }
         ],
 
@@ -341,40 +350,59 @@ function initPythonLanguage() {
         // 错误处理
         [/./, { token: 'invalid', next: '@pop' }]
       ],
-      // 单/双引号字符串状态（核心修复）
-      string: [
-        // 优先处理转义字符（防止错误触发模板状态）
-        [/\\['"{]/, 'string.escape.python'], // 明确转义规则
-
-        // 处理模板开始（仅在非转义情况下）
+      // 双引号字符串处理
+      'string.double': [
+        // 转义字符（包括转义双引号）
+        [/\\(["'\\{}])/, 'string.escape.python'],
+        // 模板开始
         [
-          /(?<!\\){/,
+          /{/,
           {
             token: 'template.bracket.open',
             next: '@template_content',
-            bracket: '@open',
-            action: { log: '进入模板状态' } // 调试日志
+            bracket: '@open'
           }
         ],
-
-        // 字符串终止符（带状态恢复保障）
+        // 双引号终止
         [
-          /['"]/,
+          /"/,
           {
             token: 'string.python',
             next: '@pop',
-            action: {
-              // 若在嵌套状态中，强制弹出所有状态
-              nextEmbedded: '@popall',
-              log: '退出字符串状态'
-            }
+            action: { nextEmbedded: '@popall' }
           }
         ],
+        // 字符串内容（排除特殊字符）
+        [/[^\\"{]+/, 'string.python'],
+        // 容错规则
+        [/./, 'string.python']
+      ],
 
-        // 常规字符串内容（排除特殊字符）
-        [/[^\\'{"]+/, 'string.python'],
-
-        // 容错规则（必须放在最后）
+      // 单引号字符串处理
+      'string.single': [
+        // 转义字符（包括转义单引号）
+        [/\\(['"\\{}])/, 'string.escape.python'],
+        // 模板开始
+        [
+          /{/,
+          {
+            token: 'template.bracket.open',
+            next: '@template_content',
+            bracket: '@open'
+          }
+        ],
+        // 单引号终止
+        [
+          /'/,
+          {
+            token: 'string.python',
+            next: '@pop',
+            action: { nextEmbedded: '@popall' }
+          }
+        ],
+        // 字符串内容（排除特殊字符）
+        [/[^\\'{]+/, 'string.python'],
+        // 容错规则
         [/./, 'string.python']
       ],
 
@@ -454,12 +482,21 @@ function initPythonLanguage() {
           }
         ],
 
-        // 字符串 - 引号
+        // 双引号字符串
         [
-          /([uUbBrRfF]+)?(["'])/,
+          /([uUbBrRfF]+)?(")/,
           {
             token: 'string.python',
-            next: '@string.$2'
+            next: '@string.double'
+          }
+        ],
+
+        // 单引号字符串
+        [
+          /([uUbBrRfF]+)?(')/,
+          {
+            token: 'string.python',
+            next: '@string.single'
           }
         ],
         // 数字
