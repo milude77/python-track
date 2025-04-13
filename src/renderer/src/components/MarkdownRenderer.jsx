@@ -74,10 +74,11 @@ const MarkdownRenderer = memo(({ content }) => {
 
   const quoteStyle = {
     ...baseStyle,
-    borderLeft: '4px solid #ddd',
-    paddingLeft: '1rem',
     margin: '1rem 0',
-    fontStyle: 'italic'
+    fontStyle: 'italic',
+    backgroundColor: isDarkMode ? '#282c34' : '#fafafa',
+    padding: '0.5rem 1rem',
+    borderRadius: '4px'
   }
 
   const listStyle = {
