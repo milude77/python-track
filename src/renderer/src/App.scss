@@ -62,9 +62,10 @@
 .code-editor-container {
     margin-top: 16px;
     border-radius: 8px;
-    overflow: hidden;
+    overflow: visible;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-    height: 400px;
+    height: auto;
+    min-height: 100px;
 }
 
 /* 代码输出区域样式 */
