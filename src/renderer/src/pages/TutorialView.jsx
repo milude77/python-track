@@ -445,7 +445,6 @@ const TutorialView = () => {
               <div className="code-practice-area">
                 <div className="code-editor-container">
                   <Editor
-                    height="400px"
                     language="python"
                     theme={theme}
                     value={code}
