@@ -15,6 +15,7 @@ from pathlib import Path
 from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 from ai_helper import AITutor
+import configparser
 
 app = Flask(__name__, static_folder='./dist')
 CORS(app)  # 允许跨域请求
@@ -86,6 +87,42 @@ def run_code(code):
         error_msg = traceback.format_exc()
         return {"success": False, "output": error_msg, "vars": namespace}
 
+#用户自定义添加模型和Key
+config_file_path = Path(__file__).parent / "config.ini"
+def push_model_key(model_name:str,key_name:str,model_key:str):
+    config = configparser.ConfigParser()
+    config.read(config_file_path)
+    if not config.has_section(model_name):
+        config.add_section(model_name)
+    keys = config.options(model_name)
+    if key_name in keys:
+        return jsonify({"error": f'密钥已存在:{key_name}'})
+    config.set(model_name,key_name, model_key)
+    with open(config_file_path, 'w') as configfile:
+        config.write(configfile)
+    return jsonify({"success": f'密钥添加成功:{key_name}'})
+
+#用户自定义删除模型和Key
+def remove_model_key(model_name,key_name):
+    config = configparser.ConfigParser()
+    config.read(config_file_path)
+    if model_name and not key_name:
+        config.remove_section(model_name)
+        return jsonify({"success": f'模型移除成功:{key_name}'})
+    config.remove_option(model_name, key_name)
+    with open(config_file_path, 'w') as configfile:
+        config.write(configfile)
+    return jsonify({"success": f'密钥移除成功:{key_name}'})
+
+#获取模型和Key
+def get_model_key():
+    config = configparser.ConfigParser()
+    config.read(config_file_path)
+    all_key_value = {}
+    for section in config.sections():
+        all_key_value[section] = dict(config.items(section))
+    return jsonify({"success": f'成功获取模型密钥列表',"key_values": all_key_value})
+    
 
 @app.route('/api/tutorials', methods=['GET'])
 def get_tutorials():
@@ -201,6 +238,24 @@ def get_solution():
         return jsonify({"solution": solution})
     except Exception as e:
         return jsonify({"error": str(e)}), 500
+
+#管理模型和Key接口
+@app.route('/api/model_key', methods=['POST'])
+def model_key():
+    data = request.json
+    model_name = data.get('model_name', '')
+    key_name = data.get('key_name', '')
+    model_key = data.get('model_key', '')
+    operate = data.get('operate')
+    if operate == 'push':
+        return push_model_key(model_name,key_name,model_key)
+    elif operate == 'get':
+        return get_model_key()
+    elif operate == 'delete':
+        return remove_model_key(model_name,key_name)
+    else:
+        return jsonify({"error": "请求方法错误"}), 405
+
 
 
 # 前端路由处理
