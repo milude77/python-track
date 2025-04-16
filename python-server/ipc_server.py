@@ -37,7 +37,8 @@ class IPCServer:
     def __init__(self):
         self.running = True
         # 从api_server.py导入的函数
-        from api_server import extract_code_blocks, extract_sections, run_code
+        from api_server import extract_code_blocks, extract_sections, run_code,operate_model_key
+        self.operate_model_key = operate_model_key
         self.extract_code_blocks = extract_code_blocks
         self.extract_sections = extract_sections
         self.run_code = run_code
@@ -123,6 +124,8 @@ class IPCServer:
                 self._handle_get_hint(payload, request_id)
             elif command == "get_solution":
                 self._handle_get_solution(payload, request_id)
+            elif command == "model_key":
+                self._handle_model_key(payload, request_id)
             else:
                 self._send_error(f"Unknown command: {command}", request_id)
         except Exception as e:
@@ -238,6 +241,21 @@ class IPCServer:
             self._send_response({"solution": solution}, request_id)
         except Exception as e:
             self._send_error(f"Error getting solution: {str(e)}", request_id)
+
+    def _handle_model_key(self, payload, request_id=None):
+        """处理模型密钥的请求"""
+        operate = payload.get("operate", "")
+        model_name = payload.get("model_name", "")
+        key_name = payload.get("key_name", "")
+        model_key = payload.get("model_key", "")
+        if not operate:
+            self._send_error("Missing required parameters", request_id)
+            return
+        try:
+            response = self.operate_model_key(operate,model_name,key_name,model_key)
+            self._send_response({"model_key": response}, request_id)
+        except Exception as e:
+            self._send_error(f"Error {operate} model key: {str(e)}", request_id)
 
     def _send_response(self, data, request_id=None):
         """发送响应数据（支持流式传输）"""

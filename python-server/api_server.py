@@ -87,41 +87,40 @@ def run_code(code):
         error_msg = traceback.format_exc()
         return {"success": False, "output": error_msg, "vars": namespace}
 
-#用户自定义添加模型和Key
-config_file_path = Path(__file__).parent / "config.ini"
-def push_model_key(model_name:str,key_name:str,model_key:str):
-    config = configparser.ConfigParser()
-    config.read(config_file_path)
-    if not config.has_section(model_name):
-        config.add_section(model_name)
-    keys = config.options(model_name)
-    if key_name in keys:
-        return jsonify({"error": f'密钥已存在:{key_name}'})
-    config.set(model_name,key_name, model_key)
-    with open(config_file_path, 'w') as configfile:
-        config.write(configfile)
-    return jsonify({"success": f'密钥添加成功:{key_name}'})
+#用户自定义对模型和Key的操作
 
-#用户自定义删除模型和Key
-def remove_model_key(model_name,key_name):
+def operate_model_key(operate:str,model_name:str=None,key_name:str=None,model_key:str=None):
+    config_file_path = Path(__file__).parent / "config.ini"
     config = configparser.ConfigParser()
     config.read(config_file_path)
-    if model_name and not key_name:
-        config.remove_section(model_name)
-        return jsonify({"success": f'模型移除成功:{key_name}'})
-    config.remove_option(model_name, key_name)
-    with open(config_file_path, 'w') as configfile:
-        config.write(configfile)
-    return jsonify({"success": f'密钥移除成功:{key_name}'})
+    if operate == 'push':
+        if not config.has_section(model_name):
+            config.add_section(model_name)
+        keys = config.options(model_name)
+        if key_name in keys:
+            return {"error": f'密钥已存在:{key_name}'}
+        config.set(model_name,key_name, model_key)
+        with open(config_file_path, 'w') as configfile:
+            config.write(configfile)
+        return {"success": f'密钥添加成功:{key_name}'}
+    elif operate == 'delete':
+        if model_name and not key_name:
+            config.remove_section(model_name)
+            return {"success": f'模型移除成功:{key_name}'}
+        config.remove_option(model_name, key_name)
+        with open(config_file_path, 'w') as configfile:
+            config.write(configfile)
+        return {"success": f'密钥移除成功:{key_name}'}
+    elif operate == 'get':
+        all_key_value = {}
+        for section in config.sections():
+            all_key_value[section] = dict(config.items(section))
+        return {"success": f'成功获取模型密钥列表',"key_values": all_key_value}
+    else:
+        return {"error": "请求方法错误"}, 405
 
-#获取模型和Key
-def get_model_key():
-    config = configparser.ConfigParser()
-    config.read(config_file_path)
-    all_key_value = {}
-    for section in config.sections():
-        all_key_value[section] = dict(config.items(section))
-    return jsonify({"success": f'成功获取模型密钥列表',"key_values": all_key_value})
+
+
     
 
 @app.route('/api/tutorials', methods=['GET'])
@@ -247,14 +246,7 @@ def model_key():
     key_name = data.get('key_name', '')
     model_key = data.get('model_key', '')
     operate = data.get('operate')
-    if operate == 'push':
-        return push_model_key(model_name,key_name,model_key)
-    elif operate == 'get':
-        return get_model_key()
-    elif operate == 'delete':
-        return remove_model_key(model_name,key_name)
-    else:
-        return jsonify({"error": "请求方法错误"}), 405
+    return operate_model_key(operate,model_name,key_name,model_key)
 
 
 
