@@ -2,7 +2,7 @@ from openai import OpenAI
 from config_loader import get_api_key, get_base_url
 import configparser
 from pathlib import Path
-
+import socket
 class AITutor:
     def __init__(self):
         api_key = get_api_key()
@@ -53,10 +53,19 @@ class AITutor:
         if result is None:
             return False
         return str(result).startswith('通过')
-
+    def check_internet_connection(self, timeout=3):
+        """检查网络连通性"""
+        try:
+            # 使用稳定的网站进行连接测试
+            socket.create_connection(("8.8.8.8", 53), timeout=timeout)
+            return True
+        except OSError:
+            return False
     def _call_api(self, prompt, max_tokens=300):
         """调用API核心方法"""
         try:
+            if not self.check_internet_connection():
+                return "网络连接失败，请检查网络设置"
             # 读取配置文件
             config_file_path = Path(__file__).parent / "config.ini"
             config = configparser.ConfigParser()
