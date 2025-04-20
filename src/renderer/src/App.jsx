@@ -6,6 +6,7 @@ import AppHeader from './components/AppHeader'
 import Sidebar from './components/Sidebar'
 import TutorialView from './pages/TutorialView'
 import './App.scss'
+import AISetupModal from './components/AISetUpModel'
 
 const { Content } = Layout
 
@@ -30,6 +31,37 @@ const App = () => {
     const savedPath = localStorage.getItem('lastTutorialPath')
     return savedPath || '/tutorial/基础知识'
   })
+
+  const [showAISetup, setShowAISetup] = useState(false)
+  const [aiErrorMessage, setAiErrorMessage] = useState(null)
+
+  useEffect(() => {
+    // 检查是否已经完成 AI 设置
+    const aiSettings = localStorage.getItem('aiSettings')
+    if (!aiSettings) {
+      setShowAISetup(true)
+    }
+
+    // 添加全局事件监听器，用于处理401错误
+    const handleAuthError = (event) => {
+      const { error } = event.detail
+      setAiErrorMessage(error)
+      setShowAISetup(true)
+    }
+
+    window.addEventListener('ai-auth-error', handleAuthError)
+
+    return () => {
+      window.removeEventListener('ai-auth-error', handleAuthError)
+    }
+  }, [])
+
+  const handleAISetupComplete = (values) => {
+    setShowAISetup(false)
+    setAiErrorMessage(null)
+    // 这里可以初始化 AI 相关功能
+    console.log('AI settings:', values)
+  }
 
   // 切换主题
   const toggleTheme = () => {
@@ -136,6 +168,11 @@ const App = () => {
               visibilityHeight={100}
             />
           </Content>
+          <AISetupModal
+            visible={showAISetup}
+            onComplete={handleAISetupComplete}
+            errorMessage={aiErrorMessage}
+          />
         </Layout>
       </Layout>
     </ConfigProvider>

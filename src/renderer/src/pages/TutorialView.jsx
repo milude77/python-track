@@ -236,13 +236,26 @@ const TutorialView = () => {
     setEvaluation(null)
 
     try {
+      const pre_response = await api.post('/api/hint', {
+        code: stringToUnicode(removeCommentsAndPrompt(code)),
+        expected_code: stringToUnicode(
+          tutorial['sections'][currentSectionIndex]['code_blocks'][currentCodeBlockIndex]
+        ),
+        actual_output: stringToUnicode(output)
+      })
+      if (JSON.stringify(pre_response.data.hint).includes('无法获取AI建议：Error code: 40')) {
+        window.dispatchEvent(
+          new CustomEvent('ai-auth-error', {
+            detail: { error: 'AI模型或密钥失效，请重新配置！' }
+          })
+        )
+      }
       const response = await api.post('/api/run-code', {
         code: stringToUnicode(code),
         expected_code: stringToUnicode(
           tutorial['sections'][currentSectionIndex]['code_blocks'][currentCodeBlockIndex]
         )
       })
-
       setOutput(response.data.output)
       setOutputStatus(response.data.success ? 'success' : 'error')
 
@@ -291,7 +304,13 @@ const TutorialView = () => {
         ),
         actual_output: stringToUnicode(output)
       })
-
+      if (JSON.stringify(response.data.hint).includes('无法获取AI建议：Error code: 40')) {
+        window.dispatchEvent(
+          new CustomEvent('ai-auth-error', {
+            detail: { error: 'AI模型或密钥失效，请重新配置！' }
+          })
+        )
+      }
       message.info(response.data.hint)
     } catch (error) {
       console.error('获取提示失败:', error)
@@ -312,7 +331,13 @@ const TutorialView = () => {
         ),
         actual_output: stringToUnicode(output)
       })
-
+      if (JSON.stringify(response.data['solution']).includes('无法获取AI建议：Error code: 40')) {
+        window.dispatchEvent(
+          new CustomEvent('ai-auth-error', {
+            detail: { error: 'AI模型或密钥失效，请重新配置！' }
+          })
+        )
+      }
       setCode(removePythonCodeBlockSyntax(response.data['solution']))
       message.success('已加载解决方案')
     } catch (error) {

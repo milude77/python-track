@@ -246,13 +246,13 @@ class IPCServer:
         """处理模型密钥的请求"""
         operate = payload.get("operate", "")
         model_name = payload.get("model_name", "")
-        key_name = payload.get("key_name", "")
+        base_url = payload.get("base_url", "")
         model_key = payload.get("model_key", "")
         if not operate:
             self._send_error("Missing required parameters", request_id)
             return
         try:
-            response = self.operate_model_key(operate,model_name,key_name,model_key)
+            response = self.operate_model_key(operate, base_url, model_name, model_key)
             self._send_response({"model_key": response}, request_id)
         except Exception as e:
             self._send_error(f"Error {operate} model key: {str(e)}", request_id)

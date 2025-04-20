@@ -45,6 +45,50 @@ const api = {
       console.error('IPC API请求错误:', error)
       throw error
     }
+  },
+
+  // 获取模型密钥配置
+  getModelKeys: async () => {
+    try {
+      const response = await window.ipcApi.getModelKeys()
+      return { data: response.data } // 假设后端直接返回
+    } catch (error) {
+      console.error('IPC API请求错误 (getModelKeys):', error)
+      throw error
+    }
+  },
+
+  // 添加或更新模型密钥
+  setModelKey: async (baseUrl, modelName, keyValue) => {
+    try {
+      const response = await window.ipcApi.setModelKey(baseUrl, modelName, keyValue)
+      return { data: response.data } // 假设后端返回成功或错误信息
+    } catch (error) {
+      console.error('IPC API请求错误 (setModelKey):', error)
+      throw error
+    }
+  },
+
+  // 删除模型或密钥
+  deleteModelKey: async (modelName) => {
+    try {
+      const response = await window.ipcApi.deleteModelKey(modelName)
+      return { data: response.data } // 假设后端返回成功或错误信息
+    } catch (error) {
+      console.error('IPC API请求错误 (deleteModelKey):', error)
+      throw error
+    }
+  },
+
+  // Check API Key Status
+  checkApiKey: async () => {
+    try {
+      const response = await window.ipcApi.checkApiKey()
+      return { data: response.data } // Assuming backend returns { status: 'valid'/'missing' } or error
+    } catch (error) {
+      console.error('IPC API请求错误 (checkApiKey):', error)
+      throw error
+    }
   }
 }
 

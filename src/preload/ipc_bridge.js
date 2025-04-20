@@ -36,6 +36,39 @@ const ipcApi = {
       payload: data
     })
   },
+
+  // 获取模型密钥配置
+  getModelKeys: async () => {
+    return ipcRenderer.invoke('python-ipc', {
+      command: 'model_key',
+      payload: { operate: 'get' }
+    })
+  },
+
+  // 添加或更新模型密钥
+  setModelKey: async (baseUrl, modelName, keyValue) => {
+    return ipcRenderer.invoke('python-ipc', {
+      command: 'model_key',
+      payload: { operate: 'push', base_url: baseUrl, model_name: modelName, model_key: keyValue }
+    })
+  },
+
+  // 删除模型或密钥
+  deleteModelKey: async (modelName) => {
+    return ipcRenderer.invoke('python-ipc', {
+      command: 'model_key',
+      payload: { operate: 'delete', model_name: modelName }
+    })
+  },
+
+  // 检查 API 密钥状态
+  checkApiKey: async () => {
+    return ipcRenderer.invoke('python-ipc', {
+      command: 'check_api_key',
+      payload: {}
+    })
+  },
+
   // 窗口控制 - 最小化
   minimizeWindow: () => {
     ipcRenderer.send('window-control', 'minimize')

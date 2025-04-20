@@ -1,15 +1,18 @@
 from openai import OpenAI
-from config_loader import get_deepseek_key
+from config_loader import get_api_key, get_base_url
+import configparser
+from pathlib import Path
 
 class AITutor:
     def __init__(self):
-        api_key = get_deepseek_key()
+        api_key = get_api_key()
+        base_url = get_base_url()
         if not api_key:
             raise ValueError("DeepSeek API密钥未配置")
 
         self.client = OpenAI(
             api_key=api_key,
-            base_url="https://api.deepseek.com"
+            base_url= base_url
         )
 
     def generate_hint(self, user_code, expected_output, actual_output):
@@ -54,8 +57,17 @@ class AITutor:
     def _call_api(self, prompt, max_tokens=300):
         """调用API核心方法"""
         try:
+            # 读取配置文件
+            config_file_path = Path(__file__).parent / "config.ini"
+            config = configparser.ConfigParser()
+            config.read(config_file_path)
+
+            # 获取第一个节点的名称
+            # 如果没有节点，使用默认值 "deepseek-chat"
+            model_name = config.sections()[0] if config.sections() else "deepseek-chat"
+
             response = self.client.chat.completions.create(
-                model="deepseek-chat",
+                model=model_name,
                 messages=[
                     {"role": "system", "content": "你是一个资深的Python编程助手"},
                     {"role": "user", "content": prompt}
@@ -66,3 +78,5 @@ class AITutor:
             return response.choices[0].message.content
         except Exception as e:
             return f"无法获取AI建议：{str(e)}"
+
+

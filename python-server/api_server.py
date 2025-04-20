@@ -89,39 +89,67 @@ def run_code(code):
 
 #用户自定义对模型和Key的操作
 
-def operate_model_key(operate:str,model_name:str=None,key_name:str=None,model_key:str=None):
+def operate_model_key(operate:str, base_url:str=None, model_name:str=None, model_key:str=None):
     config_file_path = Path(__file__).parent / "config.ini"
     config = configparser.ConfigParser()
     config.read(config_file_path)
     if operate == 'push':
-        if not config.has_section(model_name):
-            config.add_section(model_name)
-        keys = config.options(model_name)
-        if key_name in keys:
-            return {"error": f'密钥已存在:{key_name}'}
-        config.set(model_name,key_name, model_key)
+        # First check if the model_name section exists
+        if config.has_section(model_name):
+            # If exists, update the api_key value
+            config.set(model_name, 'api_key', model_key)
+            config.set(model_name, 'base_url', base_url)
+        else:
+            # Check if api_key exists in any section
+            api_key_found = False
+            for section in config.sections():
+                if 'api_key' in config.options(section):
+                    # Found section with api_key, rename it to model_name
+                    config.add_section(model_name)
+                    config.set(model_name, 'api_key', model_key)
+                    config.set(model_name, 'base_url', base_url)
+                    config.remove_section(section)
+                    api_key_found = True
+                    break
+
+            # If no existing api_key found, create new section
+            if not api_key_found:
+                config.add_section(model_name)
+                config.set(model_name, 'api_key', model_key)
+                config.set(model_name, 'base_url', base_url)
+
+        # Save changes to file
         with open(config_file_path, 'w') as configfile:
             config.write(configfile)
-        return {"success": f'密钥添加成功:{key_name}'}
+
+        return {"success": f'密钥添加成功:{model_name}'}
     elif operate == 'delete':
-        if model_name and not key_name:
+        if model_name:
             config.remove_section(model_name)
-            return {"success": f'模型移除成功:{key_name}'}
-        config.remove_option(model_name, key_name)
+            return {"success": f'模型移除成功:{model_name}'}
+        config.remove_option(model_name, 'api_key')
         with open(config_file_path, 'w') as configfile:
             config.write(configfile)
         return {"success": f'密钥移除成功:{key_name}'}
     elif operate == 'get':
-        all_key_value = {}
+        model_list = []
         for section in config.sections():
-            all_key_value[section] = dict(config.items(section))
-        return {"success": f'成功获取模型密钥列表',"key_values": all_key_value}
+            model_info = {
+                'model_name': section,
+                'base_url': config.get(section, 'base_url'),
+                'api_key': config.get(section, 'api_key')
+            }
+            model_list.append(model_info)
+        return {
+            "success": "成功获取模型列表",
+            "models": model_list
+        }
     else:
         return {"error": "请求方法错误"}, 405
 
 
 
-    
+
 
 @app.route('/api/tutorials', methods=['GET'])
 def get_tutorials():
@@ -243,10 +271,10 @@ def get_solution():
 def model_key():
     data = request.json
     model_name = data.get('model_name', '')
-    key_name = data.get('key_name', '')
+    base_url = data.get('base_url', '')
     model_key = data.get('model_key', '')
     operate = data.get('operate')
-    return operate_model_key(operate,model_name,key_name,model_key)
+    return operate_model_key(operate, base_url, model_name, model_key)
 
 
 
