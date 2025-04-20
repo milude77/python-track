@@ -59,7 +59,7 @@ class AITutor:
             # 使用稳定的网站进行连接测试
             socket.create_connection(("8.8.8.8", 53), timeout=timeout)
             return True
-        except OSError:
+        except Exception:
             return False
     def _call_api(self, prompt, max_tokens=300):
         """调用API核心方法"""
