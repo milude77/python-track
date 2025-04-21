@@ -249,26 +249,24 @@ const TutorialView = () => {
     setOutputStatus('running')
     setOutput('')
     setEvaluation(null)
-
+    const expected_code = stringToUnicode(
+      tutorial['sections'][currentSectionIndex]['code_blocks'][currentCodeBlockIndex]
+    )
     try {
-      const pre_response = await api.post('/api/hint', {
-        code: stringToUnicode(removeCommentsAndPrompt(code)),
-        expected_code: stringToUnicode(
-          tutorial['sections'][currentSectionIndex]['code_blocks'][currentCodeBlockIndex]
-        ),
-        actual_output: stringToUnicode(output)
-      })
-
-      checkAIServiceResponse(pre_response.data.hint)
-      const response = await api.post('/api/run-code', {
-        code: stringToUnicode(code),
-        expected_code: stringToUnicode(
-          tutorial['sections'][currentSectionIndex]['code_blocks'][currentCodeBlockIndex]
-        )
-      })
+      if (tutorial['title'] !== '代码演练') {
+        const pre_response = await api.post('/api/test')
+        checkAIServiceResponse(pre_response.data.test)
+      }
+      const response = await api.post(
+        tutorial['title'] !== '代码演练' ? '/api/run-code' : '/api/run-code-simple',
+        {
+          code: stringToUnicode(code),
+          expected_code
+        }
+      )
       setOutput(response.data.output)
       setOutputStatus(response.data.success ? 'success' : 'error')
-
+      // console.log(JSON.stringify(response.data))
       if (response.data['ai_evaluation']) {
         setEvaluation(response.data['ai_evaluation'])
 

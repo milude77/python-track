@@ -25,6 +25,11 @@ class AITutor:
 
         return self._call_api(prompt, max_tokens=100)
 
+    def test(self):
+        """测试AI可用性"""
+        prompt = "Hello, AI!"
+        return self._call_api(prompt, max_tokens=100)
+
     def generate_solution(self, user_code, expected_output, actual_output):
         """生成完整解决方案"""
         prompt = f"""根据以下信息提供详细解决方案：

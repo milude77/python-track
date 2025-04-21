@@ -36,6 +36,10 @@ const api = {
         response = await window.ipcApi.getHint(data)
       } else if (url === '/api/solution') {
         response = await window.ipcApi.getSolution(data)
+      } else if (url === '/api/run-code-simple') {
+        response = await window.ipcApi.runCodeSimple(data)
+      } else if (url === '/api/test') {
+        response = await window.ipcApi.test(data)
       } else {
         throw new Error(`未实现的IPC API路径: ${url}`)
       }

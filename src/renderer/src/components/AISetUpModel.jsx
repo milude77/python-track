@@ -21,7 +21,6 @@ const AISetupModal = ({ visible, onComplete, errorMessage = null }) => {
 
         // 如果没有本地保存的设置，尝试从API获取
         const response = await api.getModelKeys()
-        console.log(JSON.stringify(response.data))
         if (response.data && response.data.model_key) {
           const { base_url, model, api_key } = response.data.model_key
           // 设置表单值
@@ -44,7 +43,6 @@ const AISetupModal = ({ visible, onComplete, errorMessage = null }) => {
 
       // 使用API保存到后端
       const response = await api.setModelKey(values.baseUrl, values.model, values.apiKey)
-      console.log(JSON.stringify(response.data))
       if (response.data.model_key.success) {
         message.success('AI 设置保存成功！')
         // 仍然保存到localStorage以便前端使用

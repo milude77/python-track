@@ -22,6 +22,18 @@ const ipcApi = {
       payload: data
     })
   },
+  runCodeSimple: async (data) => {
+    return ipcRenderer.invoke('python-ipc', {
+      command: 'run_code_simple',
+      payload: data
+    })
+  },
+  test: async (data) => {
+    return ipcRenderer.invoke('python-ipc', {
+      command: 'test',
+      payload: data
+    })
+  },
   // 获取提示
   getHint: async (data) => {
     return ipcRenderer.invoke('python-ipc', {

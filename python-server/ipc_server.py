@@ -42,7 +42,6 @@ class IPCServer:
         self.extract_code_blocks = extract_code_blocks
         self.extract_sections = extract_sections
         self.run_code = run_code
-
         # 注册信号处理器
         self._setup_signal_handlers()
 
@@ -120,6 +119,10 @@ class IPCServer:
                 self._handle_get_tutorial(payload, request_id)
             elif command == "run_code":
                 self._handle_run_code(payload, request_id)
+            elif command == "run_code_simple":
+                self._handle_run_code_simple(payload, request_id)
+            elif command == "test":
+                self._handle_test(payload, request_id)
             elif command == "get_hint":
                 self._handle_get_hint(payload, request_id)
             elif command == "get_solution":
@@ -199,6 +202,31 @@ class IPCServer:
             "output": result["output"],
             "ai_evaluation": ai_evaluation
         }, request_id)
+
+    def _handle_run_code_simple(self, payload, request_id=None):
+        """处理运行代码的请求"""
+        user_code = payload.get("code", "")
+
+        if not user_code:
+            self._send_error("No code provided", request_id)
+            return
+
+        # 运行代码
+        result = self.run_code(user_code)
+
+        self._send_response({
+            "success": result["success"],
+            "output": result["output"]
+        }, request_id)
+
+    def _handle_test(self, payload, request_id=None):
+        """获取代码提示"""
+        try:
+            ai_tutor = AITutor()
+            result = ai_tutor.test()
+            self._send_response({"test": result}, request_id)
+        except Exception as e:
+            self._send_error(f"Error getting hint: {str(e)}", request_id)
 
     def _handle_get_hint(self, payload, request_id=None):
         """处理获取代码提示的请求"""

@@ -219,6 +219,22 @@ def execute_code():
         "ai_evaluation": ai_evaluation
     })
 
+@app.route('/api/run-code-simple', methods=['POST'])
+def execute_code_simple():
+    """运行用户提交的代码"""
+    data = request.json
+    user_code = data.get('code', '')
+
+    if not user_code:
+        return jsonify({"error": "没有提供代码"}), 400
+
+    # 运行代码
+    result = run_code(user_code)
+
+    return jsonify({
+        "success": result["success"],
+        "output": result["output"]
+    })
 
 @app.route('/api/hint', methods=['POST'])
 def get_hint():
@@ -243,6 +259,15 @@ def get_hint():
     except Exception as e:
         return jsonify({"error": str(e)}), 500
 
+@app.route('/api/test', methods=['POST'])
+def test():
+    """获取代码提示"""
+    try:
+        ai_tutor = AITutor()
+        result = ai_tutor.test()
+        return jsonify({"test": result})
+    except Exception as e:
+        return jsonify({"error": str(e)}), 500
 
 @app.route('/api/solution', methods=['POST'])
 def get_solution():
